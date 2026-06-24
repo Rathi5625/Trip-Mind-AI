@@ -5,12 +5,48 @@ import Image from "next/image"
 import { Compass, Sparkles, Navigation, Coins } from "lucide-react"
 import { GlassPanel } from "@/components/ui/GlassPanel"
 import { StatsBar } from "./StatsBar"
+import { SecurityHighlights } from "./SecurityHighlights"
 
 interface AuthHeroProps {
+  variant?: "default" | "security"
   showStats?: boolean
 }
 
-export function AuthHero({ showStats = true }: AuthHeroProps) {
+export function AuthHero({ variant = "default", showStats = true }: AuthHeroProps) {
+  if (variant === "security") {
+    return (
+      <div className="absolute inset-0 flex flex-col justify-between p-12 overflow-hidden bg-gradient-to-b from-[#1E293B] to-[#0F172A] dark:from-[#0B0F19] dark:to-[#020617] text-white">
+        {/* World map background trace overlay or ambient blobs */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] aspect-square rounded-full bg-blue-500/5 blur-[120px] pointer-events-none -z-10" />
+        
+        {/* Top Branding Section */}
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="flex size-9 items-center justify-center rounded-xl bg-white/10 border border-white/10 text-white backdrop-blur-md shadow-sm">
+            <Compass className="size-5" />
+          </div>
+          <span className="font-bold text-lg tracking-tight">Trip Mind AI</span>
+        </div>
+
+        {/* Middle Branding/Security info */}
+        <div className="relative z-10 space-y-4 max-w-md my-auto">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-snug">
+            Secure your journey into intelligent travel.
+          </h2>
+          <p className="text-sm text-slate-300 dark:text-slate-400 leading-relaxed">
+            Your personalized AI concierge awaits. Update your credentials to
+            maintain seamless access to your curated itineraries.
+          </p>
+        </div>
+
+        {/* Bottom Section: Three Security highlights */}
+        <div className="relative z-10 mt-auto">
+          <SecurityHighlights />
+        </div>
+      </div>
+    )
+  }
+
+  // Default Login/Signup Layout
   return (
     <div className="absolute inset-0 flex flex-col justify-between p-12 overflow-hidden bg-slate-950 text-white">
       {/* Background Image of Paris sunset */}
