@@ -37,7 +37,7 @@ export function OtpInput({ value, onChange, disabled = false }: OtpInputProps) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === "Backspace") {
       const newValue = [...value]
-      
+
       // If current input is empty, focus previous and clear it
       if (value[index] === "" && index > 0) {
         inputRefs.current[index - 1]?.focus()
@@ -64,12 +64,12 @@ export function OtpInput({ value, onChange, disabled = false }: OtpInputProps) {
 
     const digits = pasteData.split("").slice(0, 6)
     const newValue = [...value]
-    
+
     // Fill values
     digits.forEach((digit, idx) => {
       newValue[idx] = digit
     })
-    
+
     onChange(newValue)
 
     // Focus last filled or index 5
