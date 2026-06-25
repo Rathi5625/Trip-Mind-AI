@@ -1,1 +1,5 @@
-export default function Page() { return <div>Page</div>; }
+import OnboardingPage from "@/features/onboarding/OnboardingPage"
+
+export default function Page() {
+  return <OnboardingPage />
+}
