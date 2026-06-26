@@ -16,6 +16,8 @@ import { DayTimeline } from "./components/DayTimeline"
 import { AIEditBox } from "./components/AIEditBox"
 import { IntelligencePanel } from "./components/IntelligencePanel"
 import { FloatingAIButton } from "./components/FloatingAIButton"
+import { AICopilotSuggestions } from "./components/AICopilotSuggestions"
+import { CostImpactCard } from "./components/CostImpactCard"
 
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { GradientButton } from "@/components/ui/GradientButton"
@@ -157,7 +159,7 @@ function ItineraryWorkspaceContent() {
         </AnimatePresence>
 
         {/* Center Panel (Itinerary Timeline & Conversation Panel) */}
-        <div className="flex-1 flex flex-col overflow-hidden bg-slate-50/20 dark:bg-inherit relative">
+        <div className="flex flex-1 flex-col overflow-hidden bg-slate-50/20 dark:bg-inherit relative">
           
           {/* Back/Overview Bar */}
           <div className="flex items-center justify-between px-6 py-3 border-b border-black/5 dark:border-white/5 select-none shrink-0 bg-white/30 dark:bg-slate-950/20 backdrop-blur-sm">
@@ -189,44 +191,66 @@ function ItineraryWorkspaceContent() {
 
           {/* Timeline Center Scrollable Content area */}
           <div className="flex-1 overflow-y-auto px-6 py-6 md:px-8 space-y-6 scrollbar-thin no-scrollbar">
-            <div className="max-w-3xl mx-auto space-y-6 pb-28">
-              
-              {/* Hero Banner Component */}
-              <HeroBanner itinerary={itineraryData.itinerary} />
+            <div className="max-w-5xl mx-auto pb-28">
+              <div className="flex flex-col xl:flex-row gap-6 items-start">
+                
+                {/* Timeline Column */}
+                <div className="flex-1 w-full space-y-6">
+                  {/* Hero Banner Component */}
+                  <HeroBanner itinerary={itineraryData.itinerary} />
 
-              {/* Active Day Timeline component */}
-              {activeDayPlan && (
-                <DayTimeline
-                  dayPlan={activeDayPlan}
-                  isMobile={false}
-                />
-              )}
-
-              {/* Conversational Adjustments Feed Overlay */}
-              {messages.length > 0 && (
-                <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-white/5">
-                  <span className="text-[10px] font-black text-slate-450 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
-                    <MessageSquare className="size-3 text-blue-500" />
-                    AI Conversation Log
-                  </span>
-
-                  <div className="space-y-3">
-                    {messages.map((msg) => (
-                      <div
-                        key={msg.id}
-                        className={cn(
-                          "p-4 rounded-3xl text-xs font-semibold max-w-[85%] shadow-sm leading-relaxed border select-none",
-                          msg.sender === "user"
-                            ? "bg-slate-100 border-slate-100/50 text-slate-800 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200 ml-auto rounded-tr-none"
-                            : "bg-blue-50 border-blue-100 text-slate-800 dark:bg-blue-950/20 dark:border-blue-900/30 dark:text-slate-200 mr-auto rounded-tl-none"
-                        )}
-                      >
-                        {msg.text}
-                      </div>
-                    ))}
+                  {/* Stacked AI Suggestions on smaller screens */}
+                  <div className="xl:hidden flex flex-col sm:flex-row gap-4 w-full">
+                    <div className="flex-1">
+                      <AICopilotSuggestions />
+                    </div>
+                    <div className="flex-1">
+                      <CostImpactCard />
+                    </div>
                   </div>
+
+                  {/* Active Day Timeline component */}
+                  {activeDayPlan && (
+                    <DayTimeline
+                      dayPlan={activeDayPlan}
+                      isMobile={false}
+                    />
+                  )}
+
+                  {/* Conversational Adjustments Feed Overlay */}
+                  {messages.length > 0 && (
+                    <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-white/5">
+                      <span className="text-[10px] font-black text-slate-450 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5 select-none">
+                        <MessageSquare className="size-3 text-blue-500" />
+                        AI Conversation Log
+                      </span>
+
+                      <div className="space-y-3">
+                        {messages.map((msg) => (
+                          <div
+                            key={msg.id}
+                            className={cn(
+                              "p-4 rounded-3xl text-xs font-semibold max-w-[85%] shadow-sm leading-relaxed border select-none",
+                              msg.sender === "user"
+                                ? "bg-slate-100 border-slate-100/50 text-slate-800 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200 ml-auto rounded-tr-none"
+                                : "bg-blue-50 border-blue-100 text-slate-800 dark:bg-blue-950/20 dark:border-blue-900/30 dark:text-slate-200 mr-auto rounded-tl-none"
+                            )}
+                          >
+                            {msg.text}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
+
+                {/* Secondary AI Copilot Column (Visible next to Timeline on Desktop) */}
+                <div className="hidden xl:flex flex-col gap-5 w-64 shrink-0 mt-0">
+                  <AICopilotSuggestions />
+                  <CostImpactCard />
+                </div>
+
+              </div>
             </div>
           </div>
 
