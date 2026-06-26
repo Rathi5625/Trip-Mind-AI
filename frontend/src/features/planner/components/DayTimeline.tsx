@@ -16,14 +16,38 @@ export function DayTimeline({ dayPlan, isMobile = false }: DayTimelineProps) {
   return (
     <div
       id={`day-section-${dayPlan.dayNumber}`}
-      className="space-y-4 select-none w-full scroll-mt-20"
+      className="space-y-4 select-none w-full scroll-mt-20 animate-none"
     >
       {/* Day Title Row */}
-      <div className="flex items-center gap-2 px-1 py-2">
-        <Calendar className="size-4.5 text-blue-600 dark:text-blue-400 shrink-0" />
-        <h3 className="text-sm font-black text-slate-800 dark:text-slate-100 tracking-tight">
-          Day {dayPlan.dayNumber}: {dayPlan.title}
-        </h3>
+      <div className="flex items-center justify-between px-1 py-1 border-b border-slate-100/50 dark:border-white/5 pb-2">
+        <div className="flex items-center gap-2">
+          <Calendar className="size-4.5 text-blue-600 dark:text-blue-400 shrink-0" />
+          <h3 className="text-sm font-black text-slate-800 dark:text-slate-100 tracking-tight">
+            Day {dayPlan.dayNumber}: {dayPlan.title}
+          </h3>
+        </div>
+      </div>
+
+      {/* Daily Progress Statistics Panel */}
+      <div className="grid grid-cols-4 gap-2.5 p-4 rounded-3xl border border-black/5 bg-white shadow-sm dark:border-white/5 dark:bg-slate-900/60 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[8px] font-black uppercase text-slate-450 dark:text-slate-500 tracking-wider">Activities</span>
+          <span className="text-xs font-black text-slate-850 dark:text-slate-200">{dayPlan.completedCount}/{dayPlan.activities.length}</span>
+        </div>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[8px] font-black uppercase text-slate-450 dark:text-slate-500 tracking-wider">Walking</span>
+          <span className="text-xs font-black text-slate-850 dark:text-slate-200">{dayPlan.walkingDistance}</span>
+        </div>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[8px] font-black uppercase text-slate-455 dark:text-slate-500 tracking-wider">Est. Cost</span>
+          <span className="text-xs font-black text-blue-600 dark:text-blue-400">
+            ¥{dayPlan.activities.reduce((sum, act) => sum + act.cost, 0).toLocaleString()}
+          </span>
+        </div>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[8px] font-black uppercase text-slate-455 dark:text-slate-500 tracking-wider">Time Planned</span>
+          <span className="text-xs font-black text-slate-850 dark:text-slate-200">{dayPlan.timeRange}</span>
+        </div>
       </div>
 
       {/* Activities Vertical Node Stack */}
