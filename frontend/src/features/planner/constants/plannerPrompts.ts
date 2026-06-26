@@ -60,9 +60,33 @@ export const INITIAL_DESTINATION: DestinationInfo = {
   weather: "Sunny",
   crowdLevel: "High",
   budget: {
-    flights: 800,
-    hotels: 1200,
-    daily: 450,
-    total: 2450,
+    flights: 80000,
+    hotels: 120000,
+    daily: 45000,
+    total: 245000,
   },
+  savings: {
+    estimated: 245000,
+    savings: 32000,
+    cheaperFlights: true,
+    betterHotels: true,
+    restaurantDeals: true,
+  },
+  travelScore: {
+    score: 97,
+    weather: 5,
+    budget: 4,
+    safety: 5,
+    crowdLevel: 3,
+    recommendation: "Excellent Choice",
+  },
+  markers: [
+    { label: "Eiffel Tower", x: 80, y: 130, type: "attraction" },
+    { label: "Louvre Museum", x: 180, y: 110, type: "attraction" },
+    { label: "Grand Hotel", x: 150, y: 180, type: "hotel" },
+  ],
+  routes: [
+    { x1: 80, y1: 130, x2: 180, y2: 110 },
+    { x1: 180, y1: 110, x2: 150, y2: 180 },
+  ],
 }
