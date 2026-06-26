@@ -13,9 +13,11 @@ export function usePlanner() {
     currentDestination,
     isGenerating,
     isStreaming,
+    isThinking,
     setInputPrompt,
     setSelectedTemplate,
     setGenerating,
+    setThinking,
     setCurrentDestination,
     addMessage,
     clearMessages,
@@ -27,8 +29,13 @@ export function usePlanner() {
     mutationFn: plannerService.generateTripPlan,
     onMutate: () => {
       setGenerating(true)
+      setThinking(true)
     },
     onSuccess: async (data) => {
+      // Allow thinking panel checklist to animate to completion (~1.5s)
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+      
+      setThinking(false)
       setGenerating(false)
       
       // Update destination in right panel
@@ -48,6 +55,7 @@ export function usePlanner() {
       await streamText(data.itinerary)
     },
     onError: () => {
+      setThinking(false)
       setGenerating(false)
       const errorMessage: AIMessageItem = {
         id: `error-${Date.now()}`,
@@ -62,7 +70,7 @@ export function usePlanner() {
 
   const submitPrompt = (promptText?: string) => {
     const promptToSubmit = promptText || inputPrompt
-    if (!promptToSubmit.trim() || isGenerating || isStreaming) return
+    if (!promptToSubmit.trim() || isGenerating || isStreaming || isThinking) return
 
     // Clear input if submitting from the main text field
     if (!promptText) {
@@ -95,6 +103,7 @@ export function usePlanner() {
     currentDestination,
     isGenerating,
     isStreaming,
+    isThinking,
     setInputPrompt,
     submitPrompt,
     startNewSession,

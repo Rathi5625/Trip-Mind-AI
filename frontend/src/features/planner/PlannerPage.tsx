@@ -11,6 +11,8 @@ import { PromptSuggestions } from "./components/PromptSuggestions"
 import { AIInput } from "./components/AIInput"
 import { AIMessage } from "./components/AIMessage"
 import { InsightPanel } from "./components/InsightPanel"
+import { SmartPromptBuilder } from "./components/SmartPromptBuilder"
+import { AIThinkingPanel } from "./components/AIThinkingPanel"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { GradientButton } from "@/components/ui/GradientButton"
 import { useDashboardStore } from "@/features/dashboard/hooks/useDashboard"
@@ -28,7 +30,7 @@ const makeQueryClient = () =>
   })
 
 function PlannerContent() {
-  const { messages, isGenerating, isStreaming } = usePlanner()
+  const { messages, isGenerating, isStreaming, isThinking } = usePlanner()
   const { isSidebarOpen, setSidebarOpen } = useDashboardStore()
   const [activeHeaderTab, setActiveHeaderTab] = React.useState("AI Planner")
 
@@ -183,6 +185,9 @@ function PlannerContent() {
                   {messages.map((msg) => (
                     <AIMessage key={msg.id} message={msg} />
                   ))}
+                  
+                  {/* Dynamic checklist step thinking panel */}
+                  {isThinking && <AIThinkingPanel />}
                 </div>
               )}
             </div>
@@ -190,6 +195,8 @@ function PlannerContent() {
 
           {/* Sticky AI Input Bar Container */}
           <div className="p-4 md:p-6 shrink-0 bg-gradient-to-t from-slate-50/40 via-slate-50/20 to-transparent dark:from-background dark:via-background/50 dark:to-transparent max-w-3xl w-full mx-auto">
+            {/* Smart Prompt Builder Chips */}
+            <SmartPromptBuilder />
             <AIInput />
             <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 text-center mt-3 select-none">
               Trip Mind AI can make mistakes. Verify important info.

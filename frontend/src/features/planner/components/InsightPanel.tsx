@@ -1,10 +1,9 @@
-"use client"
-
 import * as React from "react"
 import { usePlannerStore } from "../store/plannerStore"
-import { DestinationPreview } from "./DestinationPreview"
+import { LiveMapPreview } from "./LiveMapPreview"
 import { WeatherCard } from "./WeatherCard"
 import { BudgetEstimator } from "./BudgetEstimator"
+import { AITravelScoreCard } from "./AITravelScoreCard"
 import { cn } from "@/lib/utils"
 
 interface InsightPanelProps {
@@ -41,10 +40,11 @@ export function InsightPanel({ className }: InsightPanelProps) {
         </div>
       </div>
 
-      {/* Destination Image Preview */}
-      <DestinationPreview
+      {/* Destination Image Preview replaced by LiveMapPreview */}
+      <LiveMapPreview
         name={currentDestination.name}
-        image={currentDestination.image}
+        markers={currentDestination.markers || []}
+        routes={currentDestination.routes || []}
       />
 
       {/* Weather & Crowd level cards */}
@@ -55,7 +55,15 @@ export function InsightPanel({ className }: InsightPanelProps) {
       />
 
       {/* Budget Estimator Cost Progress Bars */}
-      <BudgetEstimator budget={currentDestination.budget} />
+      <BudgetEstimator
+        budget={currentDestination.budget}
+        savings={currentDestination.savings}
+      />
+
+      {/* AI Travel Score Card */}
+      {currentDestination.travelScore && (
+        <AITravelScoreCard scoreDetail={currentDestination.travelScore} />
+      )}
     </aside>
   )
 }
