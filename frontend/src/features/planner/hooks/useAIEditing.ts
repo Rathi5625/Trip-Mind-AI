@@ -19,6 +19,8 @@ export function useAIEditing() {
     setEditing,
     isStreaming,
     setStreaming,
+    setBudgetImpact,
+    budgetImpact,
   } = useItineraryStore()
 
   const mutation = useMutation({
@@ -44,19 +46,40 @@ export function useAIEditing() {
       }
       addMessage(aiMessage)
 
-      // Choose appropriate explanatory stream text
+      // Choose appropriate explanatory stream text and calculate budget impact
       const promptLower = prompt.toLowerCase()
       let explanation = ""
-      if (promptLower.includes("coffee") || promptLower.includes("cafe")) {
+      if (promptLower.includes("coffee") || promptLower.includes("cafe") || promptLower.includes("food")) {
         explanation = "☕ I have successfully updated Day 1! I injected a cozy artisanal coffee stop in Yanaka at 10:30 AM right between Ueno Park and your Ginza Sushi lunch. The timeline, daily costs, and route vectors have been updated."
+        setBudgetImpact({
+          before: 350000,
+          after: 350800,
+          savings: -800,
+        })
       } else if (promptLower.includes("hidden gem") || promptLower.includes("gem") || promptLower.includes("local")) {
         explanation = "✨ Hidden gem found! I have added a tiny 4-seat bar in Golden Gai at 08:30 PM on Day 1, following your evening Shibuya crossing nightwalk. It fits perfectly into your local food and drinks theme."
-      } else if (promptLower.includes("budget") || promptLower.includes("cheaper") || promptLower.includes("optimize")) {
+        setBudgetImpact({
+          before: 350000,
+          after: 353500,
+          savings: -3500,
+        })
+      } else if (promptLower.includes("budget") || promptLower.includes("cheaper") || promptLower.includes("optimize") || promptLower.includes("hotel")) {
         explanation = "💸 Optimization complete! I searched for budget deals and saved ₹40,000 on flights and hotel rates. The readiness score is raised to 95%."
-      } else if (promptLower.includes("relax") || promptLower.includes("slower")) {
+        setBudgetImpact({
+          before: 350000,
+          after: 310000,
+          savings: 40000,
+        })
+      } else if (promptLower.includes("relax") || promptLower.includes("slower") || promptLower.includes("time")) {
         explanation = "🍃 Pace adjusted! I slowed down Day 1 by removing the heavy Ginza sushi dine-in, giving you more leisure time in Ueno Park. The crowd density forecast is now low."
+        setBudgetImpact({
+          before: 350000,
+          after: 332000,
+          savings: 18000,
+        })
       } else {
         explanation = "⚙️ I have analyzed your request and recalculated the Tokyo Culinary Journey. The timeline nodes, route vectors, and budget breakdown estimates have been re-calibrated successfully!"
+        setBudgetImpact(null)
       }
 
       // Stream the explanation text
@@ -115,5 +138,6 @@ export function useAIEditing() {
     submitEdit,
     isEditing,
     isStreaming,
+    budgetImpact,
   }
 }
