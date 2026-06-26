@@ -6,6 +6,15 @@ export interface Activity {
   description: string
   cost: number
   coordinates: { x: number; y: number }
+  
+  // Upgraded fields
+  duration: string
+  distanceToNext?: string
+  aiTips?: string
+  bookingUrl?: string
+  notes?: string
+  nearbyAttractions?: string[]
+  transportOptions?: string
 }
 
 export interface DayPlan {
@@ -13,6 +22,11 @@ export interface DayPlan {
   dayNumber: number
   title: string
   activities: Activity[]
+  
+  // Upgraded fields
+  walkingDistance: string
+  timeRange: string
+  completedCount: number
 }
 
 export interface ItineraryDetails {
