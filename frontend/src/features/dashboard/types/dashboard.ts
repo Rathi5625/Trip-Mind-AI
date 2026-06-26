@@ -60,6 +60,42 @@ export interface Statistic {
   description?: string
 }
 
+export interface MorningBriefItem {
+  id: string
+  text: string
+  type: "price" | "weather" | "visa" | "hotel" | "restaurant"
+}
+
+export interface MorningBrief {
+  greeting: string
+  bullets: MorningBriefItem[]
+}
+
+export interface TimelineEvent {
+  id: string
+  timeLabel: string
+  title: string
+  description: string
+  type: "alert" | "info" | "success" | "warning"
+}
+
+export interface TravelScoreChecklistItem {
+  id: string
+  text: string
+  status: "success" | "warning" | "info"
+}
+
+export interface TravelScore {
+  readiness: number
+  checklist: TravelScoreChecklistItem[]
+}
+
+export interface MapData {
+  visitedCountries: number
+  plannedDestinations: number
+  wishlistDestinations: number
+}
+
 export interface DashboardData {
   travelerName: string
   membershipType: string
@@ -74,4 +110,10 @@ export interface DashboardData {
   trips: Trip[]
   recommendations: Recommendation[]
   stats: Statistic[]
+  
+  // Upgraded Feature Fields
+  morningBrief: MorningBrief
+  timeline: TimelineEvent[]
+  travelScore: TravelScore
+  map: MapData
 }

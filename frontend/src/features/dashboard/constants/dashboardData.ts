@@ -64,7 +64,7 @@ export const MOCK_DASHBOARD_DATA: DashboardData = {
       endDate: "Dec 15",
       status: "Action Needed",
       statusType: "warning",
-      daysToGo: 160, // ~5 months, let's keep status "Planning Phase" or Action Needed
+      daysToGo: 160,
       image: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=600&q=80",
       travelers: [
         { name: "Alex Traveler", initials: "AT" },
@@ -131,4 +131,61 @@ export const MOCK_DASHBOARD_DATA: DashboardData = {
       description: "Active traveler profile",
     },
   ],
+
+  // Upgraded Feature Mock Data
+  morningBrief: {
+    greeting: "Good Morning, Alex",
+    bullets: [
+      { id: "mb-tokyo", text: "Flights to Tokyo dropped 14%", type: "price" },
+      { id: "mb-weather", text: "Rain expected next Thursday", type: "weather" },
+      { id: "mb-visa", text: "Visa expires in 4 months", type: "visa" },
+      { id: "mb-hotel", text: "Hotel prices increased 9%", type: "hotel" },
+      { id: "mb-restaurants", text: "AI found 3 better restaurants", type: "restaurant" },
+    ],
+  },
+  timeline: [
+    {
+      id: "tl-passport",
+      timeLabel: "Today",
+      title: "Passport Expiry Alert",
+      description: "Passport expires in 8 months. Consider renewing soon.",
+      type: "warning",
+    },
+    {
+      id: "tl-flight",
+      timeLabel: "Tomorrow",
+      title: "Flight Price Alert",
+      description: "Tokyo route pricing check scheduled by AI agent.",
+      type: "info",
+    },
+    {
+      id: "tl-hotel",
+      timeLabel: "Next Week",
+      title: "Hotel Check-in Reminder",
+      description: "Pre-check-in available for Tokyo Grand Palace.",
+      type: "success",
+    },
+    {
+      id: "tl-trip",
+      timeLabel: "12 Days",
+      title: "Tokyo Trip Begins",
+      description: "Departure flight departs at 10:15 AM from Terminal 3.",
+      type: "alert",
+    },
+  ],
+  travelScore: {
+    readiness: 96,
+    checklist: [
+      { id: "score-flights", text: "Flights Booked", status: "success" },
+      { id: "score-hotels", text: "Hotels Confirmed", status: "success" },
+      { id: "score-budget", text: "Budget Optimized", status: "success" },
+      { id: "score-weather", text: "Weather Checked", status: "success" },
+      { id: "score-passport", text: "Passport Renewal Soon", status: "warning" },
+    ],
+  },
+  map: {
+    visitedCountries: 14,
+    plannedDestinations: 2,
+    wishlistDestinations: 8,
+  },
 }
