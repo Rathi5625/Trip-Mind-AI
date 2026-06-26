@@ -3,7 +3,7 @@
 import * as React from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, LayoutDashboard, Sparkles, Compass, Map, LogOut, Settings } from "lucide-react"
+import { Sparkles } from "lucide-react"
 import { useDashboardStore, useDashboardQuery } from "./hooks/useDashboard"
 import { Sidebar } from "./components/Sidebar"
 import { TopNavbar } from "./components/TopNavbar"
@@ -15,6 +15,13 @@ import { RecommendationSection } from "./components/RecommendationSection"
 import { StatisticsCard } from "./components/StatisticsCard"
 import { FloatingAIAssistant } from "./components/FloatingAIAssistant"
 import { SkeletonLoader } from "@/components/ui/SkeletonLoader"
+
+// Upgraded Feature Imports
+import { AIMorningBrief } from "./components/AIMorningBrief"
+import { AIQuickActions } from "./components/AIQuickActions"
+import { InteractiveMap } from "./components/InteractiveMap"
+import { TravelTimeline } from "./components/TravelTimeline"
+import { AITravelScore } from "./components/AITravelScore"
 
 // Create query client specifically for the dashboard module (self-contained layout)
 const makeQueryClient = () =>
@@ -36,19 +43,17 @@ function DashboardContent() {
     if (isLoading) {
       return (
         <div className="space-y-6">
+          <SkeletonLoader variant="rect" className="h-28 w-full" />
           <SkeletonLoader variant="rect" className="h-36 w-full" />
+          <SkeletonLoader variant="rect" className="h-20 w-full" />
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-8 space-y-6">
               <SkeletonLoader variant="rect" className="h-64 w-full" />
               <SkeletonLoader variant="rect" className="h-64 w-full" />
             </div>
             <div className="lg:col-span-4 space-y-6">
+              <SkeletonLoader variant="rect" className="h-44 w-full" />
               <SkeletonLoader variant="rect" className="h-96 w-full" />
-              <div className="grid grid-cols-3 gap-3">
-                <SkeletonLoader variant="rect" className="h-24 w-full" />
-                <SkeletonLoader variant="rect" className="h-24 w-full" />
-                <SkeletonLoader variant="rect" className="h-24 w-full" />
-              </div>
             </div>
           </div>
         </div>
@@ -89,13 +94,22 @@ function DashboardContent() {
     // Default: Dashboard page content (spans left & right sections)
     return (
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Section (Welcome, Insights, Trips, Recommendations) */}
+        {/* Left Section (Morning Brief, Welcome, Quick Actions, Map, Insights, Trips, Recommendations) */}
         <div className="lg:col-span-8 space-y-6">
+          {/* AI Morning Brief */}
+          <AIMorningBrief brief={data.morningBrief} />
+
           {/* Welcome Banner */}
           <WelcomeBanner
             travelerName={data.travelerName}
             upcomingTrip={data.upcomingTrip}
           />
+
+          {/* AI Quick Actions */}
+          <AIQuickActions />
+
+          {/* Interactive World Map */}
+          <InteractiveMap mapData={data.map} />
 
           {/* AI Travel Insights */}
           <AIInsights insights={data.insights} />
@@ -107,10 +121,16 @@ function DashboardContent() {
           <RecommendationSection recommendations={data.recommendations} />
         </div>
 
-        {/* Right Section (Budget, Stats) */}
+        {/* Right Section (Travel Score, Budget, Timeline, Stats) */}
         <div className="lg:col-span-4 space-y-6">
+          {/* AI Travel Readiness Score */}
+          <AITravelScore score={data.travelScore} />
+
           {/* Budget Overview */}
           <BudgetOverview budget={data.budget} />
+
+          {/* Smart Travel Timeline */}
+          <TravelTimeline events={data.timeline} />
 
           {/* Statistics Grid */}
           <div className="grid grid-cols-3 gap-3">
@@ -130,7 +150,7 @@ function DashboardContent() {
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-bg-cloud dark:bg-background text-foreground">
+    <div className="flex h-screen w-screen overflow-hidden bg-bg-cloud dark:bg-background text-foreground animate-[fadeIn_0.5s_ease-out]">
       {/* 1. Desktop permanent sidebar */}
       <Sidebar className="hidden md:flex" />
 
@@ -165,7 +185,7 @@ function DashboardContent() {
         {/* Sticky top navbar header */}
         <TopNavbar />
 
-        {/* Page body body */}
+        {/* Page body */}
         <main className="flex-1 overflow-y-auto px-4 py-6 md:px-6 md:py-8 no-scrollbar bg-[#F8F9FB]/60 dark:bg-inherit">
           <div className="mx-auto max-w-7xl">
             {renderMainContent()}
