@@ -11,11 +11,13 @@ interface PlannerState {
   selectedTemplate: string | null
   isGenerating: boolean
   isStreaming: boolean
+  isThinking: boolean // Thinking panel visibility state
   
   setInputPrompt: (val: string) => void
   setSelectedTemplate: (id: string | null) => void
   setGenerating: (val: boolean) => void
   setStreaming: (val: boolean) => void
+  setThinking: (val: boolean) => void
   setCurrentDestination: (dest: DestinationInfo) => void
   addMessage: (msg: AIMessageItem) => void
   updateLastMessageText: (text: string) => void
@@ -29,11 +31,13 @@ export const usePlannerStore = create<PlannerState>((set) => ({
   selectedTemplate: null,
   isGenerating: false,
   isStreaming: false,
+  isThinking: false,
 
   setInputPrompt: (val) => set({ inputPrompt: val }),
   setSelectedTemplate: (id) => set({ selectedTemplate: id }),
   setGenerating: (val) => set({ isGenerating: val }),
   setStreaming: (val) => set({ isStreaming: val }),
+  setThinking: (val) => set({ isThinking: val }),
   setCurrentDestination: (dest) => set({ currentDestination: dest }),
   
   addMessage: (msg) => set((state) => ({ messages: [...state.messages, msg] })),

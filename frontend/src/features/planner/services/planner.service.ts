@@ -20,7 +20,33 @@ export const plannerService = {
           temp: "19°C",
           weather: "Clear",
           crowdLevel: "High",
-          budget: { flights: 950, hotels: 1100, daily: 550, total: 2600 },
+          budget: { flights: 95000, hotels: 110000, daily: 55000, total: 260000 },
+          savings: {
+            estimated: 260000,
+            savings: 34000,
+            cheaperFlights: true,
+            betterHotels: true,
+            restaurantDeals: true,
+          },
+          travelScore: {
+            score: 98,
+            weather: 5,
+            budget: 4,
+            safety: 5,
+            crowdLevel: 4,
+            recommendation: "Excellent Choice",
+          },
+          markers: [
+            { label: "Shibuya Crossing", x: 80, y: 190, type: "attraction" },
+            { label: "Shinjuku Park", x: 120, y: 100, type: "attraction" },
+            { label: "Tsukiji Market", x: 240, y: 220, type: "attraction" },
+            { label: "Tokyo Grand Palace", x: 180, y: 150, type: "hotel" },
+          ],
+          routes: [
+            { x1: 120, y1: 100, x2: 80, y2: 190 },
+            { x1: 80, y1: 190, x2: 240, y2: 220 },
+            { x1: 240, y1: 220, x2: 180, y2: 150 },
+          ],
         },
         itinerary: `## Tokyo Culinary & Culture Itinerary (5 Days)
 
@@ -51,7 +77,31 @@ Here is your custom AI food tour itinerary:
           temp: "8°C",
           weather: "Snowy",
           crowdLevel: "Medium",
-          budget: { flights: 1200, hotels: 2100, daily: 800, total: 4100 },
+          budget: { flights: 120000, hotels: 210000, daily: 80000, total: 410000 },
+          savings: {
+            estimated: 410000,
+            savings: 45000,
+            cheaperFlights: true,
+            betterHotels: true,
+            restaurantDeals: false,
+          },
+          travelScore: {
+            score: 95,
+            weather: 5,
+            budget: 3,
+            safety: 5,
+            crowdLevel: 2,
+            recommendation: "Excellent Choice",
+          },
+          markers: [
+            { label: "Lucerne Station", x: 110, y: 100, type: "start" },
+            { label: "Mt. Pilatus Peak", x: 150, y: 160, type: "attraction" },
+            { label: "Alps Chalet Resort", x: 210, y: 220, type: "hotel" },
+          ],
+          routes: [
+            { x1: 110, y1: 100, x2: 150, y2: 160 },
+            { x1: 150, y1: 160, x2: 210, y2: 220 },
+          ],
         },
         itinerary: `## Romantic Swiss Alps Chalet Retreat (7 Days)
 
@@ -77,7 +127,31 @@ Your winter wonderland escape awaits:
           temp: "29°C",
           weather: "Humid",
           crowdLevel: "Medium",
-          budget: { flights: 700, hotels: 800, daily: 300, total: 1800 },
+          budget: { flights: 70000, hotels: 80000, daily: 30000, total: 180000 },
+          savings: {
+            estimated: 180000,
+            savings: 22000,
+            cheaperFlights: true,
+            betterHotels: true,
+            restaurantDeals: true,
+          },
+          travelScore: {
+            score: 92,
+            weather: 4,
+            budget: 5,
+            safety: 4,
+            crowdLevel: 3,
+            recommendation: "Great Choice",
+          },
+          markers: [
+            { label: "Denpasar Airport", x: 100, y: 200, type: "start" },
+            { label: "Ubud Villa Resort", x: 140, y: 120, type: "hotel" },
+            { label: "Uluwatu Temple", x: 210, y: 240, type: "attraction" },
+          ],
+          routes: [
+            { x1: 100, y1: 200, x2: 140, y2: 120 },
+            { x1: 140, y1: 120, x2: 210, y2: 240 },
+          ],
         },
         itinerary: `## Tropical Bali Family Adventure (8 Days)
 
@@ -98,7 +172,33 @@ Your tropical island itinerary details:
           temp: "5°C",
           weather: "Windy",
           crowdLevel: "Low",
-          budget: { flights: 900, hotels: 1500, daily: 600, total: 3000 },
+          budget: { flights: 90000, hotels: 150000, daily: 60000, total: 300000 },
+          savings: {
+            estimated: 300000,
+            savings: 26000,
+            cheaperFlights: true,
+            betterHotels: false,
+            restaurantDeals: true,
+          },
+          travelScore: {
+            score: 94,
+            weather: 3,
+            budget: 4,
+            safety: 5,
+            crowdLevel: 1,
+            recommendation: "Great Choice",
+          },
+          markers: [
+            { label: "Reykjavik Town", x: 100, y: 150, type: "start" },
+            { label: "Blue Lagoon Spa", x: 70, y: 180, type: "attraction" },
+            { label: "Vik Black Beach", x: 220, y: 210, type: "attraction" },
+            { label: "Foss Hotel", x: 170, y: 160, type: "hotel" },
+          ],
+          routes: [
+            { x1: 100, y1: 150, x2: 70, y2: 180 },
+            { x1: 70, y1: 180, x2: 170, y2: 160 },
+            { x1: 170, y1: 160, x2: 220, y2: 210 },
+          ],
         },
         itinerary: `## Iceland Golden Circle & Glaciers (6 Days)
 
@@ -119,7 +219,31 @@ Volcanoes, glaciers, and lights:
         temp: "22°C",
         weather: "Sunny",
         crowdLevel: "High",
-        budget: { flights: 800, hotels: 1200, daily: 450, total: 2450 },
+        budget: { flights: 80000, hotels: 120000, daily: 45000, total: 245000 },
+        savings: {
+          estimated: 245000,
+          savings: 32000,
+          cheaperFlights: true,
+          betterHotels: true,
+          restaurantDeals: true,
+        },
+        travelScore: {
+          score: 97,
+          weather: 5,
+          budget: 4,
+          safety: 5,
+          crowdLevel: 3,
+          recommendation: "Excellent Choice",
+        },
+        markers: [
+          { label: "Eiffel Tower", x: 80, y: 130, type: "attraction" },
+          { label: "Louvre Museum", x: 180, y: 110, type: "attraction" },
+          { label: "Grand Hotel", x: 150, y: 180, type: "hotel" },
+        ],
+        routes: [
+          { x1: 80, y1: 130, x2: 180, y2: 110 },
+          { x1: 180, y1: 110, x2: 150, y2: 180 },
+        ],
       },
       itinerary: `## Paris, France - Budget Explorer (10 Days)
 
@@ -128,12 +252,7 @@ Your custom Parisian itinerary:
 ### Day 1: Eiffel Tower & Seine Cruise
 - **Morning:** Climb Eiffel Tower early to skip queues.
 - **Afternoon:** Stroll along the Seine, visit Louvre gardens.
-- **Evening:** Sunset boat cruise down the Seine river.
-
-### Day 2: Montmartre Artisans
-- **Morning:** Coffee and croissants in Montmartre, visit Sacré-Cœur.
-- **Afternoon:** View local art stalls in Place du Tertre.
-- **Evening:** Dinner at a cozy French bistro.`,
+- **Evening:** Sunset boat cruise down the Seine river.`,
     };
   },
 }
