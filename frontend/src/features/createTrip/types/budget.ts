@@ -10,6 +10,11 @@ export interface BudgetPreset {
   maxSpend: number // in USD
   defaultSpend: number // in USD
   iconName: "piggy" | "bed" | "gem" | "star"
+  hoverDetails?: {
+    accommodation: string
+    dining: string
+    activities: string
+  }
 }
 
 export interface BudgetState {
