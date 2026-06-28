@@ -1,0 +1,69 @@
+"use client"
+
+import * as React from "react"
+import { Sparkles, Compass, Hotel, ShieldAlert } from "lucide-react"
+import { useRecommendations } from "../hooks/useRecommendations"
+import { ATLAS_TRENDS } from "../constants/destinationData"
+
+export function AtlasAssistant() {
+  const { triggerSurprise, isLoading } = useRecommendations()
+
+  return (
+    <div className="flex flex-col p-6 rounded-3xl border border-black/5 bg-white/40 shadow-sm dark:border-white/5 dark:bg-slate-900/40 backdrop-blur-xl w-full select-none gap-5">
+      {/* Avatar Head */}
+      <div className="flex items-center gap-3">
+        <div className="relative flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-500/10 dark:bg-blue-900/30 border border-blue-500/20">
+          <span className="text-lg">🤖</span>
+          {/* Status Dot */}
+          <span className="absolute bottom-0 right-0 block size-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
+        </div>
+        <div>
+          <h4 className="text-xs font-black text-slate-800 dark:text-slate-100">Atlas</h4>
+          <span className="text-[9px] font-bold text-blue-500 flex items-center gap-1">
+            <span className="flex size-1.5 rounded-full bg-blue-500 animate-pulse" />
+            Live Recommendations
+          </span>
+        </div>
+      </div>
+
+      <p className="text-[10.5px] font-semibold text-slate-500 dark:text-slate-400 leading-relaxed">
+        I'm analyzing global travel trends to find your perfect consultation match...
+      </p>
+
+      {/* Suggestion Cards */}
+      <div className="space-y-3">
+        {/* Trend 1 */}
+        <div className="p-3.5 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 space-y-1">
+          <div className="flex items-center gap-1.5 text-emerald-650 dark:text-emerald-450">
+            <Compass className="size-3.5" />
+            <span className="text-[9px] font-black uppercase tracking-wider">Trending Match</span>
+          </div>
+          <p className="text-[10px] font-semibold text-slate-650 dark:text-slate-350 leading-relaxed">
+            <span className="font-extrabold text-slate-800 dark:text-slate-150">{ATLAS_TRENDS.trendingMatch.country}</span> is {ATLAS_TRENDS.trendingMatch.reason}
+          </p>
+        </div>
+
+        {/* Trend 2 */}
+        <div className="p-3.5 rounded-2xl bg-amber-500/5 border border-amber-500/10 space-y-1">
+          <div className="flex items-center gap-1.5 text-amber-650 dark:text-amber-400">
+            <Hotel className="size-3.5" />
+            <span className="text-[9px] font-black uppercase tracking-wider">Luxury Highlight</span>
+          </div>
+          <p className="text-[10px] font-semibold text-slate-650 dark:text-slate-350 leading-relaxed">
+            Consider <span className="font-extrabold text-slate-800 dark:text-slate-150">{ATLAS_TRENDS.luxuryHighlight.destination}</span> {ATLAS_TRENDS.luxuryHighlight.reason}
+          </p>
+        </div>
+      </div>
+
+      {/* CTA Button */}
+      <button
+        onClick={triggerSurprise}
+        disabled={isLoading}
+        className="w-full mt-2 cursor-pointer flex items-center justify-center gap-2 py-3 rounded-2xl text-[10.5px] font-black text-white bg-gradient-to-r from-blue-600 to-amber-650 hover:from-blue-700 hover:to-amber-700 disabled:opacity-40 disabled:cursor-not-allowed shadow-md transition-all uppercase tracking-wider"
+      >
+        <Sparkles className="size-3.5 fill-white/20 animate-pulse" />
+        {isLoading ? "Analyzing Trends..." : "Surprise Me With Luxury"}
+      </button>
+    </div>
+  )
+}
