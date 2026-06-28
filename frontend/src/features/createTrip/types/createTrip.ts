@@ -13,6 +13,10 @@ export interface Destination {
   confidence: number // 1-100
   attractions: string[]
   transport: string
+  matchReasons: string[]
+  tempRange: string
+  flightDuration: string
+  tripDuration: string
 }
 
 export type WizardStep = 1 | 2 | 3 | 4 | 5

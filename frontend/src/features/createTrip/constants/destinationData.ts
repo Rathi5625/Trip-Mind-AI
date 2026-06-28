@@ -15,7 +15,11 @@ export const DESTINATIONS: Destination[] = [
     bestMonths: "March - May, Oct - Nov",
     confidence: 98,
     attractions: ["Ginza Shopping", "Senso-ji Temple", "Tsukiji Outer Market", "Shibuya Sky"],
-    transport: "Shinkansen & Private Chauffeur"
+    transport: "Shinkansen & Private Chauffeur",
+    matchReasons: ["Luxury Hotels", "Culinary Experiences", "City Exploration", "Autumn Weather"],
+    tempRange: "15°C - 22°C",
+    flightDuration: "7.5 hours",
+    tripDuration: "7 Days"
   },
   {
     id: "bali-retreat",
@@ -31,7 +35,11 @@ export const DESTINATIONS: Destination[] = [
     bestMonths: "May - September",
     confidence: 95,
     attractions: ["Ubud Monkey Forest", "Tegallalang Rice Terraces", "Uluwatu Temple Cliff", "Seminyak Beach"],
-    transport: "Scooter & Private Driver"
+    transport: "Scooter & Private Driver",
+    matchReasons: ["Wellness & Spas", "Geothermal Pools", "Geographical Wonders", "Relaxed Pacing"],
+    tempRange: "26°C - 31°C",
+    flightDuration: "9 hours",
+    tripDuration: "10 Days"
   },
   {
     id: "parisian-chic",
@@ -47,7 +55,11 @@ export const DESTINATIONS: Destination[] = [
     bestMonths: "April - June, Sept - Oct",
     confidence: 92,
     attractions: ["Eiffel Tower Lounge", "Louvre Museum", "Champs-Élysées", "Seine Cruise Dinner"],
-    transport: "Paris Métro & Luxury Sedans"
+    transport: "Paris Métro & Luxury Sedans",
+    matchReasons: ["Fine Dining", "Historic Architecture", "Couture Exhibitions", "Romantic Cruises"],
+    tempRange: "12°C - 19°C",
+    flightDuration: "10 hours",
+    tripDuration: "5 Days"
   },
   {
     id: "iceland-aurora",
@@ -63,7 +75,11 @@ export const DESTINATIONS: Destination[] = [
     bestMonths: "November - February",
     confidence: 97,
     attractions: ["Blue Lagoon", "Gullfoss Waterfall", "Vatnajökull Ice Caves", "Black Sand Beach"],
-    transport: "Super Jeep 4x4 & Guided Bus"
+    transport: "Super Jeep 4x4 & Guided Bus",
+    matchReasons: ["Glacier Hikes", "Aurora Viewing", "Active Volcano Safaris", "Geothermal Baths"],
+    tempRange: "-2°C - 4°C",
+    flightDuration: "13.5 hours",
+    tripDuration: "8 Days"
   }
 ]
 
