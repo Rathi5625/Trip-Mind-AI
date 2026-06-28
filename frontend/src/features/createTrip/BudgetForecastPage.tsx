@@ -10,6 +10,11 @@ import { BudgetTierCard } from "./components/BudgetTierCard"
 import { ForecastChart } from "./components/ForecastChart"
 import { ExpenseBreakdown } from "./components/ExpenseBreakdown"
 import { NavigationFooter } from "./components/NavigationFooter"
+import { BudgetHealthMeter } from "./components/BudgetHealthMeter"
+import { BudgetComparison } from "./components/BudgetComparison"
+import { BookingTimeline } from "./components/BookingTimeline"
+import { BUDGET_TIPS } from "./constants/budgetPresets"
+import { useCurrency } from "./hooks/useCurrency"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { useBudgetStore } from "./store/budgetStore"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
@@ -26,6 +31,7 @@ const makeQueryClient = () =>
 
 function BudgetForecastPageContent() {
   const { destination, selectedTier } = useBudgetStore()
+  const { formatValue } = useCurrency()
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F9FB] dark:bg-[#0B0F19] text-slate-800 dark:text-slate-100 transition-colors duration-300">
@@ -55,8 +61,6 @@ function BudgetForecastPageContent() {
 
         </div>
       </header>
-
-      {/* 2. Main Page Grid */}
       <main className="flex-grow max-w-7xl w-full mx-auto px-6 py-6 md:py-8 grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
         
         {/* Left Sidebar Info Cards Column */}
@@ -102,6 +106,9 @@ function BudgetForecastPageContent() {
             </div>
           </div>
 
+          {/* Dynamic Budget Health Meter */}
+          <BudgetHealthMeter />
+
         </div>
 
         {/* Center Main forecasting workspace */}
@@ -126,6 +133,9 @@ function BudgetForecastPageContent() {
           {/* Presets/Tiers grid row */}
           <BudgetTierCard />
 
+          {/* Budget Comparison List with detail popovers */}
+          <BudgetComparison />
+
           {/* Pie allocation chart & expense cards split */}
           <div className="p-6 rounded-3xl border border-black/5 bg-white/40 shadow-sm dark:border-white/5 dark:bg-slate-900/40 backdrop-blur-xl flex flex-col md:flex-row items-center gap-8">
             
@@ -142,6 +152,25 @@ function BudgetForecastPageContent() {
               <ExpenseBreakdown />
             </div>
 
+          </div>
+
+          {/* Booking timeline predictions */}
+          <BookingTimeline />
+
+          {/* AI Savings Suggestions tips */}
+          <div className="p-6 rounded-3xl border border-amber-500/10 bg-amber-500/5 select-none space-y-3 shadow-sm">
+            <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-450">
+              <span className="text-sm">💡</span>
+              <span className="text-[10px] font-black uppercase tracking-wider">AI Budget Tips</span>
+            </div>
+            <div className="space-y-2 text-[10px] font-bold text-slate-700 dark:text-slate-300 leading-relaxed">
+              {BUDGET_TIPS.map((tip, idx) => (
+                <div key={idx} className="flex items-start gap-2">
+                  <span className="text-emerald-500 font-extrabold text-xs">✓</span>
+                  <span>{tip.text.replace("$180", formatValue(180)).replace("$240", formatValue(240)).replace("$95", formatValue(95))}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
         </div>
