@@ -3,10 +3,22 @@
 import * as React from "react"
 import { Sparkles, Compass, Hotel, ShieldAlert } from "lucide-react"
 import { useRecommendations } from "../hooks/useRecommendations"
-import { ATLAS_TRENDS } from "../constants/destinationData"
+import { ATLAS_TRENDS, DESTINATIONS } from "../constants/destinationData"
+import { useTripWizardStore } from "../store/tripWizardStore"
 
 export function AtlasAssistant() {
   const { triggerSurprise, isLoading } = useRecommendations()
+  const { setSelectedDestination, setStep, setSearchQuery, setPreferences } = useTripWizardStore()
+
+  const handleProactiveSelect = (query: string, pref: string) => {
+    const tokyo = DESTINATIONS.find((d) => d.id === "tokyo-luxury")
+    if (tokyo) {
+      setSelectedDestination(tokyo)
+      setPreferences([pref])
+      setSearchQuery(query)
+      setStep(2) // Automatically start date selection step
+    }
+  }
 
   return (
     <div className="flex flex-col p-6 rounded-3xl border border-black/5 bg-white/40 shadow-sm dark:border-white/5 dark:bg-slate-900/40 backdrop-blur-xl w-full select-none gap-5">
@@ -29,6 +41,35 @@ export function AtlasAssistant() {
       <p className="text-[10.5px] font-semibold text-slate-500 dark:text-slate-400 leading-relaxed">
         I'm analyzing global travel trends to find your perfect consultation match...
       </p>
+
+      {/* Proactive Atlas Suggestion Block */}
+      <div className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/10 space-y-3">
+        <div className="flex items-center gap-1.5 text-blue-650 dark:text-blue-400">
+          <span className="text-sm">💬</span>
+          <span className="text-[9px] font-black uppercase tracking-wider">Atlas Suggestion</span>
+        </div>
+        <p className="text-[10px] font-semibold text-slate-650 dark:text-slate-350 leading-relaxed">
+          Based on your profile, I think you'd love <span className="font-extrabold text-slate-800 dark:text-slate-150">Japan</span> in October.
+        </p>
+        
+        <div className="grid grid-cols-2 gap-2 pt-1">
+          {[
+            { label: "Food Tour", emoji: "🍣", pref: "Food", query: "Tokyo culinary and sushi food tour" },
+            { label: "Culture Trip", emoji: "🏯", pref: "Culture", query: "Kyoto and Tokyo historic temples culture" },
+            { label: "Scenic Escape", emoji: "🌸", pref: "Nature", query: "Mount Fuji scenic cherry blossom nature" },
+            { label: "Luxury Tour", emoji: "🎌", pref: "Luxury", query: "Tokyo high-end luxury shopping hotels" }
+          ].map((opt) => (
+            <button
+              key={opt.label}
+              onClick={() => handleProactiveSelect(opt.query, opt.pref)}
+              className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl border border-black/5 bg-white hover:bg-slate-50 dark:border-white/5 dark:bg-slate-900/60 dark:hover:bg-slate-800 text-[9.5px] font-bold text-slate-700 dark:text-slate-350 transition-colors shadow-sm cursor-pointer text-left"
+            >
+              <span>{opt.emoji}</span>
+              <span className="truncate">{opt.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Suggestion Cards */}
       <div className="space-y-3">

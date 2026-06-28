@@ -29,6 +29,18 @@ const makeQueryClient = () =>
     },
   })
 
+const filterOptions = [
+  { id: "all", label: "All", emoji: "🌍", matches: () => true },
+  { id: "luxury", label: "Luxury", emoji: "💎", matches: (d: Destination) => d.category === "Culinary" || d.matchReasons.includes("Luxury Hotels") },
+  { id: "beaches", label: "Beaches", emoji: "🏝", matches: (d: Destination) => d.category === "Wellness" || d.attractions.some(a => a.toLowerCase().includes("beach")) },
+  { id: "mountains", label: "Mountains", emoji: "🏔", matches: (d: Destination) => d.description.toLowerCase().includes("alps") || d.description.toLowerCase().includes("glacier") || d.attractions.some(a => a.toLowerCase().includes("waterfall")) },
+  { id: "food", label: "Food", emoji: "🍜", matches: (d: Destination) => d.category === "Culinary" || d.matchReasons.includes("Culinary Experiences") || d.matchReasons.includes("Fine Dining") },
+  { id: "culture", label: "Culture", emoji: "🎭", matches: (d: Destination) => d.category === "Culinary" || d.category === "Romance" || d.attractions.some(a => a.toLowerCase().includes("temple") || a.toLowerCase().includes("museum")) },
+  { id: "nature", label: "Nature", emoji: "🌿", matches: (d: Destination) => d.category === "Wellness" || d.category === "Adventure" || d.attractions.some(a => a.toLowerCase().includes("forest") || a.toLowerCase().includes("waterfall")) },
+  { id: "family", label: "Family", emoji: "👨‍👩‍👧", matches: (d: Destination) => d.id === "tokyo-luxury" || d.id === "bali-retreat" },
+  { id: "adventure", label: "Adventure", emoji: "🎒", matches: (d: Destination) => d.category === "Adventure" || d.matchReasons.includes("Glacier Hikes") }
+]
+
 export function CreateTripPageContent() {
   const {
     step,
@@ -44,8 +56,28 @@ export function CreateTripPageContent() {
     togglePreference
   } = useTripWizard()
 
+  const [activeFilter, setActiveFilter] = React.useState("all")
+
   // React Query for destination list filtering
   const { data: destinations = [], isLoading } = useDestinationSearch(searchQuery)
+
+  const filteredDestinations = React.useMemo(() => {
+    if (activeFilter === "all") return destinations
+    const option = filterOptions.find(o => o.id === activeFilter)
+    if (!option) return destinations
+    return destinations.filter(option.matches)
+  }, [destinations, activeFilter])
+
+  const suggestedTrip = React.useMemo(() => {
+    const active = selectedDestination || destinations[0] || null
+    return {
+      destination: active?.country || "Japan",
+      duration: active?.tripDuration || "7 Days",
+      budget: active?.priceRange || "₹1,45,000",
+      season: active?.bestMonths ? active.bestMonths.split(",")[0] : "October",
+      confidence: active?.confidence || 98
+    }
+  }, [selectedDestination, destinations])
 
   const handleSelectDestination = (dest: Destination) => {
     setSelectedDestination(dest)
@@ -150,6 +182,36 @@ export function CreateTripPageContent() {
                   {/* AI Search input */}
                   <DestinationSearch />
 
+                  {/* Estimated Trip Summary */}
+                  <div className="p-5 rounded-3xl border border-blue-500/10 bg-blue-500/5 dark:border-blue-950/15 dark:bg-blue-950/5 select-none space-y-2.5">
+                    <span className="text-[9px] font-black uppercase text-blue-600 dark:text-blue-450 tracking-wider flex items-center gap-1.5">
+                      <Sparkles className="size-3 text-blue-500 fill-blue-500/20" />
+                      Suggested Trip
+                    </span>
+                    <div className="grid grid-cols-5 gap-3.5 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                      <div className="flex flex-col">
+                        <span className="text-[7.5px] font-black text-slate-400 uppercase tracking-wider">Destination</span>
+                        <span className="text-slate-805 dark:text-slate-200 mt-0.5 truncate">{suggestedTrip.destination}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[7.5px] font-black text-slate-400 uppercase tracking-wider">Duration</span>
+                        <span className="text-slate-805 dark:text-slate-200 mt-0.5">{suggestedTrip.duration}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[7.5px] font-black text-slate-400 uppercase tracking-wider">Budget</span>
+                        <span className="text-blue-600 dark:text-blue-400 mt-0.5 font-extrabold">{suggestedTrip.budget}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[7.5px] font-black text-slate-400 uppercase tracking-wider">Best Season</span>
+                        <span className="text-slate-805 dark:text-slate-200 mt-0.5">{suggestedTrip.season}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[7.5px] font-black text-slate-400 uppercase tracking-wider">Confidence</span>
+                        <span className="text-emerald-650 dark:text-emerald-450 mt-0.5 font-black">{suggestedTrip.confidence}%</span>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Trending tags chips */}
                   <TrendingTags />
 
@@ -167,8 +229,29 @@ export function CreateTripPageContent() {
                     </button>
                   </div>
 
+                  {/* Smart Filters Chips Row */}
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 select-none scrollbar-none no-scrollbar">
+                    {filterOptions.map((opt) => {
+                      const isActive = activeFilter === opt.id
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => setActiveFilter(opt.id)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[9.5px] font-black transition-all cursor-pointer whitespace-nowrap ${
+                            isActive
+                              ? "border-blue-600 bg-blue-600 text-white shadow-sm"
+                              : "border-black/5 bg-white hover:bg-slate-50 text-slate-650 dark:border-white/5 dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-350"
+                          }`}
+                        >
+                          <span>{opt.emoji}</span>
+                          <span>{opt.label}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+
                   {/* Destinations list grid */}
-                  <RecommendationGrid destinations={destinations} onSelect={handleSelectDestination} />
+                  <RecommendationGrid destinations={filteredDestinations} onSelect={handleSelectDestination} />
 
                   {/* Footer Actions */}
                   <NavigationActions />
