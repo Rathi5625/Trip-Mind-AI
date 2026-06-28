@@ -8,6 +8,8 @@ export interface DateEventBadge {
   label: string
   emoji: string
   type: "weather" | "price" | "festival" | "autumn"
+  description?: string
+  whyVisit?: string
 }
 
 export interface SeasonStats {

@@ -18,7 +18,7 @@ export function AIConciergePanel() {
   }
 
   return (
-    <div className="flex flex-col p-6 rounded-3xl border border-black/5 bg-white/40 shadow-sm dark:border-white/5 dark:bg-slate-900/40 backdrop-blur-xl w-full select-none gap-5">
+    <div className="flex flex-col p-6 rounded-3xl border border-black/5 bg-white/40 shadow-sm dark:border-white/5 dark:bg-slate-900/40 backdrop-blur-xl w-full select-none gap-4">
       {/* Avatar Head */}
       <div className="flex items-center gap-3">
         <div className="relative flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-500/10 dark:bg-blue-900/30 border border-blue-500/20">
@@ -42,7 +42,7 @@ export function AIConciergePanel() {
       </div>
 
       {/* Suggestion selection chip wrapper */}
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         <span className="block text-[8px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
           Suggested Date Range
         </span>
@@ -55,6 +55,75 @@ export function AIConciergePanel() {
           <span>Lock in Oct 12 - 24</span>
         </button>
       </div>
+
+      {/* 3. Atlas Recommendation Box */}
+      <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10 space-y-2.5">
+        <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-450">
+          <Sparkles className="size-3.5 fill-amber-500/20" />
+          <span className="text-[9px] font-black uppercase tracking-wider">Atlas Recommendation</span>
+        </div>
+        
+        <p className="text-[10px] font-semibold text-slate-650 dark:text-slate-350 leading-relaxed">
+          Leaving <span className="font-extrabold text-slate-800 dark:text-slate-100">3 days earlier</span> could save approximately <span className="text-emerald-600 dark:text-emerald-450 font-extrabold">₹18,500</span> on flights.
+        </p>
+        
+        <div className="space-y-1.5 pt-1 border-t border-amber-500/10 text-[9.5px] font-bold text-slate-500 dark:text-slate-400">
+          <span className="block text-[8px] font-black uppercase text-slate-400">October 15–24 offers:</span>
+          <div className="space-y-1">
+            <div className="flex items-center gap-1.5">
+              <span className="text-emerald-500">✓</span>
+              <span>Peak autumn colors</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-emerald-500">✓</span>
+              <span>Comfortable weather</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-emerald-500">✓</span>
+              <span>Lower hotel prices</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. AI Travel Scorecard */}
+      <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-[9px] font-black uppercase text-emerald-650 dark:text-emerald-450 tracking-wider">
+            Travel Score
+          </span>
+          <span className="text-xs font-black text-emerald-655 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+            96%
+          </span>
+        </div>
+
+        {/* Stars ratings */}
+        <div className="space-y-1.5 text-[9px] font-bold text-slate-500 dark:text-slate-400">
+          <div className="flex items-center justify-between">
+            <span>Weather</span>
+            <span className="text-amber-500 text-[10px]">⭐⭐⭐⭐⭐</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>Budget</span>
+            <span className="text-amber-500 text-[10px]">⭐⭐⭐⭐☆</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>Crowds</span>
+            <span className="text-amber-500 text-[10px]">⭐⭐⭐⭐☆</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>Events</span>
+            <span className="text-amber-500 text-[10px]">⭐⭐⭐⭐⭐</span>
+          </div>
+        </div>
+
+        {/* Recommendation text */}
+        <div className="pt-2 border-t border-emerald-500/10 text-[9.5px] font-semibold text-slate-600 dark:text-slate-350">
+          <span className="font-bold text-slate-400 block text-[8px] uppercase tracking-wider">Overall Recommendation</span>
+          <span className="text-slate-805 dark:text-slate-200 font-black">Excellent choice.</span>
+        </div>
+      </div>
+
     </div>
   )
 }
