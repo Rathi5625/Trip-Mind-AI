@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useDashboardStore } from "../hooks/useDashboard"
+import { useRouter } from "next/navigation"
 
 export function AIQuickActions() {
   const { setAIOpen } = useDashboardStore()
@@ -62,13 +63,18 @@ export function AIQuickActions() {
     },
   ]
 
-  const handleActionClick = (promptText: string) => {
-    setAIOpen(true)
-    // We could trigger a global chat input filler. Let's alert for UX and open the assistant!
-    const assistantPromptField = document.querySelector('input[placeholder="Ask your travel co-pilot..."]') as HTMLInputElement
-    if (assistantPromptField) {
-      assistantPromptField.value = promptText
-      assistantPromptField.focus()
+  const router = useRouter()
+
+  const handleActionClick = (label: string, promptText: string) => {
+    if (label === "Plan a Trip") {
+      router.push("/planner/create-trip")
+    } else {
+      setAIOpen(true)
+      const assistantPromptField = document.querySelector('input[placeholder="Ask your travel co-pilot..."]') as HTMLInputElement
+      if (assistantPromptField) {
+        assistantPromptField.value = promptText
+        assistantPromptField.focus()
+      }
     }
   }
 
@@ -113,7 +119,7 @@ export function AIQuickActions() {
               variants={cardVariants}
               whileHover={{ y: -3, scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => handleActionClick(action.prompt)}
+              onClick={() => handleActionClick(action.label, action.prompt)}
               className="flex flex-col items-center justify-center text-center p-4 rounded-2xl border border-black/5 bg-white shadow-sm hover:shadow-md cursor-pointer transition-all dark:border-white/5 dark:bg-slate-900/60 h-full group"
             >
               {/* Icon Container */}

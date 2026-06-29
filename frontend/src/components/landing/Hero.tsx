@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { ArrowRight, Play } from "lucide-react"
 import { GradientButton } from "@/components/ui/GradientButton"
@@ -58,10 +59,12 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 md:mb-20 w-full max-w-md sm:max-w-none"
         >
-          <GradientButton variant="primary" size="lg" className="w-full sm:w-auto">
-            Start Planning Free
-            <ArrowRight className="size-4 ml-1 transition-transform group-hover/button:translate-x-1" />
-          </GradientButton>
+          <Link href="/planner/create-trip" className="w-full sm:w-auto">
+            <GradientButton variant="primary" size="lg" className="w-full sm:w-auto cursor-pointer">
+              Start Planning Free
+              <ArrowRight className="size-4 ml-1 transition-transform group-hover/button:translate-x-1" />
+            </GradientButton>
+          </Link>
           <GradientButton variant="secondary" size="lg" className="w-full sm:w-auto">
             <Play className="size-4 mr-1 text-primary-blue fill-primary-blue/20" />
             Watch Demo

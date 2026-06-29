@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, Calendar, Users, Sliders, MapPin, Compass, ArrowRight } from "lucide-react"
 
@@ -18,6 +19,9 @@ import { Footer } from "./components/Footer"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Destination } from "./types/createTrip"
+import { useTravelDatesStore } from "./store/travelDatesStore"
+import { useBudgetStore } from "./store/budgetStore"
+
 
 const makeQueryClient = () =>
   new QueryClient({
@@ -56,6 +60,8 @@ export function CreateTripPageContent() {
     togglePreference
   } = useTripWizard()
 
+  const router = useRouter()
+
   const [activeFilter, setActiveFilter] = React.useState("all")
 
   // React Query for destination list filtering
@@ -81,7 +87,9 @@ export function CreateTripPageContent() {
 
   const handleSelectDestination = (dest: Destination) => {
     setSelectedDestination(dest)
-    setStep(2) // Automatically transition to Dates Step
+    useTravelDatesStore.getState().setDestination(dest.name)
+    useBudgetStore.getState().setDestination(dest.name)
+    router.push("/planner/create-trip/dates")
   }
 
   // Pre-fill dates helper

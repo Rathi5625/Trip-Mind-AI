@@ -20,6 +20,7 @@ import {
 } from "lucide-react"
 import { useDashboardStore } from "../hooks/useDashboard"
 import { UserProfileCard } from "./UserProfileCard"
+import { useRouter } from "next/navigation"
 
 interface SidebarProps {
   className?: string
@@ -36,38 +37,43 @@ export function Sidebar({ className, isMobile = false }: SidebarProps) {
   } = useDashboardStore()
 
   const mainNavItems = [
-    { label: "Dashboard", icon: LayoutDashboard },
-    { label: "AI Planner", icon: Sparkles },
-    { label: "Discover", icon: Compass },
-    { label: "Map", icon: Map },
+    { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
+    { label: "AI Planner", icon: Sparkles, href: "/planner" },
+    { label: "Discover", icon: Compass, href: "/discover" },
+    { label: "Map", icon: Map, href: "/planner/itinerary" },
   ]
 
   const travelItems = [
-    { label: "My Trips", icon: Plane },
-    { label: "Itineraries", icon: FileText },
-    { label: "Bookings", icon: Ticket },
+    { label: "My Trips", icon: Plane, href: "/dashboard" },
+    { label: "Itineraries", icon: FileText, href: "/planner/itinerary" },
+    { label: "Bookings", icon: Ticket, href: "/planner/itinerary" },
   ]
 
   const managementItems = [
-    { label: "Expenses", icon: CreditCard },
-    { label: "Analytics", icon: BarChart3 },
+    { label: "Expenses", icon: CreditCard, href: "/planner/create-trip/budget" },
+    { label: "Analytics", icon: BarChart3, href: "/analytics" },
   ]
 
-  const handleNavClick = (label: string) => {
+  const router = useRouter()
+
+  const handleNavClick = (label: string, href?: string) => {
     setActiveTab(label)
     if (isMobile) {
       setSidebarOpen(false)
     }
+    if (href) {
+      router.push(href)
+    }
   }
 
   // Render a group of nav items
-  const renderNavGroup = (title: string | null, items: typeof mainNavItems) => (
+  const renderNavGroup = (title: string | null, items: any[]) => (
     <div className="space-y-1.5 w-full">
       {title && !isSidebarCollapsed && (
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="px-3 text-[10px] font-bold tracking-wider text-slate-400 dark:text-slate-500 uppercase select-none"
+          className="px-3 text-[10px] font-bold tracking-wider text-slate-400 dark:text-slate-550 uppercase select-none"
         >
           {title}
         </motion.p>
@@ -80,22 +86,22 @@ export function Sidebar({ className, isMobile = false }: SidebarProps) {
           return (
             <button
               key={item.label}
-              onClick={() => handleNavClick(item.label)}
+              onClick={() => handleNavClick(item.label, item.href)}
               className={cn(
                 "group relative flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer",
                 isActive
                   ? "bg-primary-blue text-white shadow-md shadow-blue-500/10"
-                  : "text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-200"
+                  : "text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-205"
               )}
             >
               <Icon className={cn("size-4.5 shrink-0", isActive ? "stroke-[2.5]" : "stroke-[2]")} />
               
               {!isSidebarCollapsed && (
                 <motion.span
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  className="truncate"
+                   initial={{ opacity: 0, x: -10 }}
+                   animate={{ opacity: 1, x: 0 }}
+                   exit={{ opacity: 0, x: -10 }}
+                   className="truncate"
                 >
                   {item.label}
                 </motion.span>
@@ -162,7 +168,7 @@ export function Sidebar({ className, isMobile = false }: SidebarProps) {
       {/* Footer Profile & Settings */}
       <div className="mt-auto space-y-4 pt-4 border-t border-black/5 dark:border-white/5">
         <button
-          onClick={() => handleNavClick("Settings")}
+          onClick={() => handleNavClick("Settings", "/profile")}
           className={cn(
             "group relative flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-all duration-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-200 cursor-pointer",
             activeTab === "Settings" && "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100"

@@ -9,12 +9,13 @@ import { GradientButton } from "@/components/ui/GradientButton"
 import { cn } from "@/lib/utils"
 
 const navItems = [
-  { name: "Home", href: "#", active: true },
-  { name: "Discover", href: "#discover" },
-  { name: "AI Planner", href: "#ai-planner" },
+  { name: "Home", href: "/", active: true },
+  { name: "Discover", href: "/discover" },
+  { name: "AI Planner", href: "/planner" },
   { name: "Features", href: "#features" },
   { name: "Pricing", href: "#pricing" },
 ]
+
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
@@ -80,9 +81,11 @@ export function Navbar() {
             >
               Sign In
             </Link>
-            <GradientButton variant="primary" size="sm">
-              Get Started
-            </GradientButton>
+            <Link href="/planner/create-trip">
+              <GradientButton variant="primary" size="sm" className="cursor-pointer">
+                Get Started
+              </GradientButton>
+            </Link>
             <ThemeToggle />
           </div>
 
@@ -135,9 +138,11 @@ export function Navbar() {
                 >
                   Sign In
                 </Link>
-                <GradientButton variant="primary" size="md" onClick={() => setMobileMenuOpen(false)}>
-                  Get Started
-                </GradientButton>
+                <Link href="/planner/create-trip" onClick={() => setMobileMenuOpen(false)}>
+                  <GradientButton variant="primary" size="md" className="cursor-pointer">
+                    Get Started
+                  </GradientButton>
+                </Link>
               </div>
             </nav>
           </motion.div>

@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { Plane, CalendarCheck } from "lucide-react"
 import { GlassPanel } from "@/components/ui/GlassPanel"
 import { GradientButton } from "@/components/ui/GradientButton"
+import { useRouter } from "next/navigation"
 
 interface WelcomeBannerProps {
   travelerName: string
@@ -15,8 +16,10 @@ interface WelcomeBannerProps {
 }
 
 export function WelcomeBanner({ travelerName, upcomingTrip }: WelcomeBannerProps) {
+  const router = useRouter()
+
   const handleViewItinerary = () => {
-    alert("Loading your Tokyo itinerary with offline map caches and AI recommendation list...")
+    router.push("/planner/itinerary")
   }
 
   return (

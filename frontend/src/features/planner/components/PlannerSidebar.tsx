@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { motion } from "framer-motion"
+import { useRouter } from "next/navigation"
 import { Globe2, Plus } from "lucide-react"
 import { usePlanner } from "../hooks/usePlanner"
 import { SavedTrips } from "./SavedTrips"
@@ -17,12 +18,14 @@ interface PlannerSidebarProps {
 export function PlannerSidebar({ className, isMobile = false }: PlannerSidebarProps) {
   const { startNewSession } = usePlanner()
   const { setSidebarOpen } = useDashboardStore()
+  const router = useRouter()
 
   const handleNewSession = () => {
     startNewSession()
     if (isMobile) {
       setSidebarOpen(false)
     }
+    router.push("/planner/create-trip")
   }
 
   return (
