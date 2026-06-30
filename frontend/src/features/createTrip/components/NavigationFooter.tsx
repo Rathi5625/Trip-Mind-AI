@@ -9,16 +9,22 @@ export function NavigationFooter() {
   const pathname = usePathname()
 
   const handleBack = () => {
-    if (pathname === "/planner/create-trip/travelers") {
+    if (pathname === "/planner/create-trip/preferences") {
+      router.push("/planner/create-trip/travelers")
+    } else if (pathname === "/planner/create-trip/travelers") {
       router.push("/planner/create-trip/budget")
-    } else {
+    } else if (pathname === "/planner/create-trip/budget") {
       router.push("/planner/create-trip/dates")
+    } else {
+      router.push("/planner/create-trip")
     }
   }
 
   const handleNext = () => {
     if (pathname === "/planner/create-trip/budget") {
       router.push("/planner/create-trip/travelers")
+    } else if (pathname === "/planner/create-trip/travelers") {
+      router.push("/planner/create-trip/preferences")
     } else {
       router.push("/planner/itinerary")
     }
@@ -29,28 +35,33 @@ export function NavigationFooter() {
       {/* Back Button */}
       <button
         onClick={handleBack}
-        className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-655 bg-white hover:bg-slate-50 border border-black/5 dark:bg-slate-950 dark:hover:bg-slate-900 dark:border-white/5 dark:text-slate-350 transition-colors cursor-pointer"
+        className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-655 bg-white hover:bg-slate-50 border border-black/5 dark:bg-slate-950 dark:hover:bg-slate-900 dark:border-white/5 dark:text-slate-355 transition-colors cursor-pointer"
       >
         <ArrowLeft className="size-3.5" />
         <span>Back</span>
       </button>
+
       {/* Steps Indicator readouts */}
       <div className="hidden sm:flex items-center gap-3 text-[9px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
         <span className="flex items-center gap-1">
-          <span className={`flex size-4.5 items-center justify-center rounded-full text-[8px] ${pathname === "/planner/create-trip" ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-slate-800"}`}>1</span> 
-          Destination
+          <span className={`flex size-4.5 items-center justify-center rounded-full text-[8px] ${pathname === "/planner/create-trip" ? "bg-blue-600 text-white animate-pulse" : "bg-slate-100 dark:bg-slate-800"}`}>1</span> 
+          Dest
         </span>
         <span className="flex items-center gap-1">
-          <span className={`flex size-4.5 items-center justify-center rounded-full text-[8px] ${pathname === "/planner/create-trip/dates" ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-slate-800"}`}>2</span> 
+          <span className={`flex size-4.5 items-center justify-center rounded-full text-[8px] ${pathname === "/planner/create-trip/dates" ? "bg-blue-600 text-white animate-pulse" : "bg-slate-100 dark:bg-slate-800"}`}>2</span> 
           Dates
         </span>
         <span className="flex items-center gap-1">
-          <span className={`flex size-4.5 items-center justify-center rounded-full text-[8px] ${pathname === "/planner/create-trip/budget" ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-slate-800"}`}>3</span> 
+          <span className={`flex size-4.5 items-center justify-center rounded-full text-[8px] ${pathname === "/planner/create-trip/budget" ? "bg-blue-600 text-white animate-pulse" : "bg-slate-100 dark:bg-slate-800"}`}>3</span> 
           Budget
         </span>
         <span className="flex items-center gap-1">
-          <span className={`flex size-4.5 items-center justify-center rounded-full text-[8px] ${pathname === "/planner/create-trip/travelers" ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-slate-800"}`}>4</span> 
-          Travelers
+          <span className={`flex size-4.5 items-center justify-center rounded-full text-[8px] ${pathname === "/planner/create-trip/travelers" ? "bg-blue-600 text-white animate-pulse" : "bg-slate-100 dark:bg-slate-800"}`}>4</span> 
+          Group
+        </span>
+        <span className="flex items-center gap-1">
+          <span className={`flex size-4.5 items-center justify-center rounded-full text-[8px] ${pathname === "/planner/create-trip/preferences" ? "bg-blue-600 text-white animate-pulse" : "bg-slate-100 dark:bg-slate-800"}`}>5</span> 
+          Vibe
         </span>
       </div>
 
@@ -65,3 +76,4 @@ export function NavigationFooter() {
     </div>
   )
 }
+
