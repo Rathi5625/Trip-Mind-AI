@@ -14,6 +14,8 @@ export const usePreferencesStore = create<PreferencesState>((set) => ({
     return { selectedInterests: newInterests }
   }),
 
+  setSelectedInterests: (interests) => set({ selectedInterests: interests }),
+
   setSelectedAccommodation: (id) => set({ selectedAccommodation: id }),
   setTravelPace: (pace) => set({ travelPace: pace }),
   

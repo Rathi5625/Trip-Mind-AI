@@ -25,6 +25,7 @@ export interface PreferencesState {
   travelPace: string
 
   toggleInterest: (id: string) => void
+  setSelectedInterests: (interests: string[]) => void
   setSelectedAccommodation: (id: string | null) => void
   setTravelPace: (pace: string) => void
   resetPreferencesStore: () => void

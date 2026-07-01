@@ -6,12 +6,19 @@ import { motion } from "framer-motion"
 import { X } from "lucide-react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
-import { AIConciergePanel } from "./components/AIConciergePanel"
 import { InterestCard } from "./components/InterestCard"
 import { AccommodationCard } from "./components/AccommodationCard"
 import { PaceSelector } from "./components/PaceSelector"
 import { NavigationFooter } from "./components/NavigationFooter"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
+
+// Upgraded AI preferences components
+import { SmartChips } from "./components/SmartChips"
+import { AtlasConcierge } from "./components/AtlasConcierge"
+import { AIPersonalityProfile } from "./components/AIPersonalityProfile"
+import { CompatibilityMeter } from "./components/CompatibilityMeter"
+import { LiveItineraryPreview } from "./components/LiveItineraryPreview"
+import { HotelRecommendationPreview } from "./components/HotelRecommendationPreview"
 
 import { INTEREST_OPTIONS, ACCOMMODATION_OPTIONS, PACE_OPTIONS } from "./constants/preferenceOptions"
 import { usePreferences } from "./hooks/usePreferences"
@@ -67,7 +74,7 @@ function PreferencesPageContent() {
       <main className="flex-grow max-w-7xl w-full mx-auto px-6 py-6 md:py-8 flex flex-col gap-6">
         
         {/* Progress bar at the top */}
-        <div className="w-full max-w-4xl mx-auto space-y-2 select-none">
+        <div className="w-full max-w-7xl mx-auto space-y-2 select-none">
           <div className="flex justify-between text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none">
             <span>Step 5 of 6</span>
             <span>83%</span>
@@ -83,7 +90,7 @@ function PreferencesPageContent() {
         </div>
 
         {/* Stepper Header */}
-        <div className="max-w-4xl w-full mx-auto space-y-1.5 mt-4 select-none">
+        <div className="max-w-7xl w-full mx-auto space-y-1.5 mt-4 select-none">
           <h1 className="text-3xl md:text-4xl font-black text-slate-850 dark:text-slate-100 tracking-tight leading-tight">
             Crafting your experience.
           </h1>
@@ -93,18 +100,21 @@ function PreferencesPageContent() {
         </div>
 
         {/* Workspace Columns */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start max-w-4xl w-full mx-auto mt-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start max-w-7xl w-full mx-auto mt-4">
           
-          {/* Center Main preferences workspace */}
-          <div className="lg:col-span-3 flex flex-col gap-8">
+          {/* Left Main preferences workspace (Takes 7 columns) */}
+          <div className="lg:col-span-7 flex flex-col gap-8">
             
+            {/* Smart Suggestions Chips */}
+            <SmartChips />
+
             {/* Interests Section */}
             <div className="space-y-4">
               <h3 className="text-sm font-black text-slate-800 dark:text-slate-200 tracking-wide uppercase">
                 What are your primary interests?
               </h3>
               
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {INTEREST_OPTIONS.map((interest) => (
                   <InterestCard
                     key={interest.id}
@@ -155,9 +165,15 @@ function PreferencesPageContent() {
 
           </div>
 
-          {/* Right AI Concierge sidebar */}
-          <div className="lg:col-span-1 h-full min-h-[500px]">
-            <AIConciergePanel />
+          {/* Right Live AI Dashboard (Takes 5 columns) */}
+          <div className="lg:col-span-5 flex flex-col gap-6">
+            <AtlasConcierge />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <AIPersonalityProfile />
+              <CompatibilityMeter />
+            </div>
+            <LiveItineraryPreview />
+            <HotelRecommendationPreview />
           </div>
 
         </div>
