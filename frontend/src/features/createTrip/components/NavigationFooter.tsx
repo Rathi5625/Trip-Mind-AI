@@ -25,6 +25,8 @@ export function NavigationFooter() {
       router.push("/planner/create-trip/travelers")
     } else if (pathname === "/planner/create-trip/travelers") {
       router.push("/planner/create-trip/preferences")
+    } else if (pathname === "/planner/create-trip/preferences") {
+      router.push("/planner/create-trip/review")
     } else {
       router.push("/planner/itinerary")
     }
@@ -62,6 +64,10 @@ export function NavigationFooter() {
         <span className="flex items-center gap-1">
           <span className={`flex size-4.5 items-center justify-center rounded-full text-[8px] ${pathname === "/planner/create-trip/preferences" ? "bg-blue-600 text-white animate-pulse" : "bg-slate-100 dark:bg-slate-800"}`}>5</span> 
           Vibe
+        </span>
+        <span className="flex items-center gap-1">
+          <span className={`flex size-4.5 items-center justify-center rounded-full text-[8px] ${pathname === "/planner/create-trip/review" ? "bg-blue-600 text-white animate-pulse" : "bg-slate-100 dark:bg-slate-800"}`}>6</span> 
+          Rev
         </span>
       </div>
 
