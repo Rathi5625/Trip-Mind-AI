@@ -17,6 +17,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { GradientButton } from "@/components/ui/GradientButton"
 import { useDashboardStore } from "@/features/dashboard/hooks/useDashboard"
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
 
 // Query client for planner
 const makeQueryClient = () =>
@@ -33,6 +34,7 @@ function PlannerContent() {
   const { messages, isGenerating, isStreaming, isThinking } = usePlanner()
   const { isSidebarOpen, setSidebarOpen } = useDashboardStore()
   const [activeHeaderTab, setActiveHeaderTab] = React.useState("AI Planner")
+  const router = useRouter()
 
   const headerLinks = [
     { label: "Home", href: "/dashboard" },
@@ -105,7 +107,7 @@ function PlannerContent() {
         <div className="flex items-center gap-2.5">
           <ThemeToggle />
           <button
-            onClick={() => alert("Sign In modal triggered!")}
+            onClick={() => router.push("/login")}
             className="hidden sm:inline-flex text-xs font-bold text-slate-600 hover:text-slate-800 dark:text-slate-450 dark:hover:text-slate-200 px-3 py-2 cursor-pointer"
           >
             Sign In
@@ -113,7 +115,7 @@ function PlannerContent() {
           <GradientButton
             variant="primary"
             size="sm"
-            onClick={() => alert("Redirecting to onboarding subscription plans...")}
+            onClick={() => router.push("/onboarding")}
             className="shadow-sm font-extrabold"
           >
             Get Started
