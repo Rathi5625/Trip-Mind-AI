@@ -5,6 +5,7 @@ import Link from "next/link"
 import { motion, AnimatePresence, Variants } from "framer-motion"
 import { Bell, Settings, Diamond, HelpCircle } from "lucide-react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { useSearchParams, useRouter } from "next/navigation"
 
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { SearchHero } from "./components/SearchHero"
@@ -31,6 +32,7 @@ import { useSearchResults } from "./hooks/useSearchResults"
 import { useFilters } from "./hooks/useFilters"
 import { useComparison } from "./hooks/useComparison"
 import { useHiddenGems } from "./hooks/useHiddenGems"
+import { useSearchStore } from "./store/searchStore"
 import { SORT_OPTIONS } from "./constants/searchFilters"
 
 const makeQueryClient = () =>
@@ -48,6 +50,17 @@ function SearchResultsPageContent() {
   const filterHook = useFilters()
   const compareHook = useComparison()
   const gemsHook = useHiddenGems()
+  const { setActiveSearchQuery, activeSearchQuery } = useSearchStore()
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  // Sync URL query param to store on mount
+  React.useEffect(() => {
+    const q = searchParams.get("q")
+    if (q && q !== activeSearchQuery) {
+      setActiveSearchQuery(q)
+    }
+  }, [searchParams])
 
   // Staggers
   const containerVariants: Variants = {
@@ -127,11 +140,13 @@ function SearchResultsPageContent() {
 
       {/* 2. Hero Search Section */}
       <SearchHero
-        value={resultsHook.activeSearchQuery}
-        onChange={resultsHook.setSortBy} // dummy action or search action
+        value={activeSearchQuery}
+        onChange={(val) => setActiveSearchQuery(val)}
         onSubmit={(e) => {
           e?.preventDefault()
-          alert(`Searching: ${resultsHook.activeSearchQuery}`)
+          if (activeSearchQuery.trim()) {
+            router.push(`/discover/search?q=${encodeURIComponent(activeSearchQuery)}`)
+          }
         }}
       />
 

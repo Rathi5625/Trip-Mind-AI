@@ -238,7 +238,7 @@ export function useOnboardingCompletion() {
     }
   }, [store.selectedDestinations, store.budget, store.duration, store.group])
 
-  const handleGoToDashboard = () => router.push("/dashboard")
+  const handleGoToDashboard = () => router.push("/planner/generated")
   const handleEditProfile = () => router.push("/onboarding")
 
   return {
