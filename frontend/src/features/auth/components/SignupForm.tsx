@@ -4,127 +4,128 @@ import * as React from "react"
 import { motion } from "framer-motion"
 import { Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { toast } from "react-hot-toast"
 import { cn } from "@/lib/utils"
 import { TermsCheckbox } from "./TermsCheckbox"
 
+import { authService } from "@/services/auth.service"
+import { useAuthStore } from "@/store/authStore"
+
+const signupSchema = z.object({
+  fullName: z.string().min(2, "Full name must be at least 2 characters."),
+  email: z.string().min(1, "Email is required").email("Please enter a valid email address."),
+  password: z.string().min(8, "Password must be at least 8 characters long."),
+  confirmPassword: z.string().min(1, "Please confirm your password."),
+  agreeToTerms: z.boolean().refine((val) => val === true, {
+    message: "You must agree to the Terms & Conditions.",
+  }),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match.",
+  path: ["confirmPassword"],
+})
+
+type SignupValues = z.infer<typeof signupSchema>
+
 export function SignupForm() {
-  const [fullName, setFullName] = React.useState("")
-  const [email, setEmail] = React.useState("")
-  const [password, setPassword] = React.useState("")
-  const [confirmPassword, setConfirmPassword] = React.useState("")
+  const router = useRouter()
+  const { login } = useAuthStore()
   const [showPassword, setShowPassword] = React.useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false)
-  const [agreeToTerms, setAgreeToTerms] = React.useState(false)
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [error, setError] = React.useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupValues>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      fullName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      agreeToTerms: false,
+    },
+  })
 
-    // Input Validations
-    if (!fullName || !email || !password || !confirmPassword) {
-      setError("Please fill in all fields.")
-      return
+  const agreeToTermsValue = watch("agreeToTerms")
+
+  const onSubmit = async (data: SignupValues) => {
+    try {
+      const response = await authService.signup(data)
+      login(response.user, response.token)
+      toast.success("Account created successfully!")
+      router.push("/onboarding") // Redirect to Onboarding on successful signup
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create account")
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      setError("Please enter a valid email address.")
-      return
-    }
-
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters long.")
-      return
-    }
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.")
-      return
-    }
-
-    if (!agreeToTerms) {
-      setError("You must agree to the Terms & Conditions and Privacy Policy.")
-      return
-    }
-
-    setIsLoading(true)
-
-    // Simulate signup request
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 1500)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4 font-sans text-sm">
-      {/* Error Alert */}
-      {error && (
-        <div className="p-3 text-xs font-semibold text-rose-600 bg-rose-50 dark:bg-rose-950/20 dark:text-rose-400 rounded-xl border border-rose-100 dark:border-rose-950/40">
-          {error}
-        </div>
-      )}
-
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col gap-4 font-sans text-sm">
       {/* Full Name Input */}
-      <div className="relative border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/40 px-4 pt-2.5 pb-1.5 focus-within:ring-2 focus-within:ring-primary-blue/30 focus-within:border-primary-blue transition-all">
-        <label
-          htmlFor="fullName"
-          className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500"
-        >
+      <div className={cn(
+        "relative border rounded-xl bg-slate-50/50 dark:bg-slate-900/40 px-4 pt-2.5 pb-1.5 focus-within:ring-2 focus-within:ring-primary-blue/30 transition-all",
+        errors.fullName ? "border-rose-500 focus-within:border-rose-500" : "border-slate-200 dark:border-slate-800 focus-within:border-primary-blue"
+      )}>
+        <label htmlFor="fullName" className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
           Full Name
         </label>
         <input
           id="fullName"
           type="text"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
+          {...register("fullName")}
           placeholder="John Doe"
-          disabled={isLoading}
+          disabled={isSubmitting}
           className="w-full bg-transparent border-0 p-0 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-0 text-sm mt-0.5"
         />
       </div>
+      {errors.fullName && <span className="text-xs text-rose-500 px-1 -mt-2">{errors.fullName.message}</span>}
 
       {/* Email Input */}
-      <div className="relative border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/40 px-4 pt-2.5 pb-1.5 focus-within:ring-2 focus-within:ring-primary-blue/30 focus-within:border-primary-blue transition-all">
-        <label
-          htmlFor="email"
-          className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500"
-        >
+      <div className={cn(
+        "relative border rounded-xl bg-slate-50/50 dark:bg-slate-900/40 px-4 pt-2.5 pb-1.5 focus-within:ring-2 focus-within:ring-primary-blue/30 transition-all",
+        errors.email ? "border-rose-500 focus-within:border-rose-500" : "border-slate-200 dark:border-slate-800 focus-within:border-primary-blue"
+      )}>
+        <label htmlFor="email" className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
           Email Address
         </label>
         <input
           id="email"
           type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          {...register("email")}
           placeholder="name@example.com"
-          disabled={isLoading}
+          disabled={isSubmitting}
           className="w-full bg-transparent border-0 p-0 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-0 text-sm mt-0.5"
         />
       </div>
+      {errors.email && <span className="text-xs text-rose-500 px-1 -mt-2">{errors.email.message}</span>}
 
       {/* Password Input */}
-      <div className="relative border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/40 px-4 pt-2.5 pb-1.5 focus-within:ring-2 focus-within:ring-primary-blue/30 focus-within:border-primary-blue transition-all">
-        <label
-          htmlFor="password"
-          className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500"
-        >
+      <div className={cn(
+        "relative border rounded-xl bg-slate-50/50 dark:bg-slate-900/40 px-4 pt-2.5 pb-1.5 focus-within:ring-2 focus-within:ring-primary-blue/30 transition-all",
+        errors.password ? "border-rose-500 focus-within:border-rose-500" : "border-slate-200 dark:border-slate-800 focus-within:border-primary-blue"
+      )}>
+        <label htmlFor="password" className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
           Password
         </label>
         <div className="flex items-center justify-between">
           <input
             id="password"
             type={showPassword ? "text" : "password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            {...register("password")}
             placeholder="••••••••"
-            disabled={isLoading}
+            disabled={isSubmitting}
             className="w-full bg-transparent border-0 p-0 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-0 text-sm mt-0.5"
           />
           <button
             type="button"
-            disabled={isLoading}
+            disabled={isSubmitting}
             onClick={() => setShowPassword(!showPassword)}
             className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors ml-2 cursor-pointer"
           >
@@ -132,28 +133,28 @@ export function SignupForm() {
           </button>
         </div>
       </div>
+      {errors.password && <span className="text-xs text-rose-500 px-1 -mt-2">{errors.password.message}</span>}
 
       {/* Confirm Password Input */}
-      <div className="relative border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/40 px-4 pt-2.5 pb-1.5 focus-within:ring-2 focus-within:ring-primary-blue/30 focus-within:border-primary-blue transition-all">
-        <label
-          htmlFor="confirmPassword"
-          className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500"
-        >
+      <div className={cn(
+        "relative border rounded-xl bg-slate-50/50 dark:bg-slate-900/40 px-4 pt-2.5 pb-1.5 focus-within:ring-2 focus-within:ring-primary-blue/30 transition-all",
+        errors.confirmPassword ? "border-rose-500 focus-within:border-rose-500" : "border-slate-200 dark:border-slate-800 focus-within:border-primary-blue"
+      )}>
+        <label htmlFor="confirmPassword" className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
           Confirm Password
         </label>
         <div className="flex items-center justify-between">
           <input
             id="confirmPassword"
             type={showConfirmPassword ? "text" : "password"}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            {...register("confirmPassword")}
             placeholder="••••••••"
-            disabled={isLoading}
+            disabled={isSubmitting}
             className="w-full bg-transparent border-0 p-0 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-0 text-sm mt-0.5"
           />
           <button
             type="button"
-            disabled={isLoading}
+            disabled={isSubmitting}
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors ml-2 cursor-pointer"
           >
@@ -161,28 +162,30 @@ export function SignupForm() {
           </button>
         </div>
       </div>
+      {errors.confirmPassword && <span className="text-xs text-rose-500 px-1 -mt-2">{errors.confirmPassword.message}</span>}
 
       {/* TermsCheckbox Component */}
-      <div className="my-1">
+      <div className="my-1 flex flex-col">
         <TermsCheckbox
-          checked={agreeToTerms}
-          onChange={setAgreeToTerms}
-          disabled={isLoading}
+          checked={agreeToTermsValue}
+          onChange={(val) => setValue("agreeToTerms", val, { shouldValidate: true })}
+          disabled={isSubmitting}
         />
+        {errors.agreeToTerms && <span className="text-xs text-rose-500 mt-1">{errors.agreeToTerms.message}</span>}
       </div>
 
       {/* Create Account Submit Button */}
       <motion.button
         type="submit"
-        disabled={isLoading}
+        disabled={isSubmitting}
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
         className={cn(
           "w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary-blue text-white font-semibold shadow-lg shadow-blue-500/20 dark:shadow-none hover:shadow-blue-500/30 transition-all cursor-pointer disabled:opacity-50",
-          isLoading && "pointer-events-none"
+          isSubmitting && "pointer-events-none"
         )}
       >
-        {isLoading ? (
+        {isSubmitting ? (
           <Loader2 className="size-4 animate-spin" />
         ) : (
           <>
@@ -192,7 +195,7 @@ export function SignupForm() {
         )}
       </motion.button>
 
-      {/* Traveler setup setup timeline note */}
+      {/* Traveler setup timeline note */}
       <div className="text-center text-xs text-slate-400 dark:text-slate-500 font-medium">
         Traveler Profile Setup takes less than 2 minutes
       </div>

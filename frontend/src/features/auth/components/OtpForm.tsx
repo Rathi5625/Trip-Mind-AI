@@ -7,11 +7,13 @@ import { z } from "zod"
 import { motion } from "framer-motion"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowRight, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react"
+import { toast } from "react-hot-toast"
 import { cn } from "@/lib/utils"
 import { OtpInput } from "./OtpInput"
 import { OtpTimer } from "./OtpTimer"
 import { ResendCode } from "./ResendCode"
 import Link from "next/link"
+import { authService } from "@/services/auth.service"
 
 const schema = z.object({
   code: z
@@ -32,14 +34,13 @@ export function OtpForm() {
   const source = searchParams.get("source") || "signup"
   
   const [timerSeconds, setTimerSeconds] = React.useState(60)
-  const [isLoading, setIsLoading] = React.useState(false)
   const [isSuccess, setIsSuccess] = React.useState(false)
   const [submitError, setSubmitError] = React.useState("")
 
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -59,23 +60,15 @@ export function OtpForm() {
   const handleResend = () => {
     setTimerSeconds(60)
     setSubmitError("")
-    // Trigger simulated API resend
+    toast.success("Verification code resent!")
   }
 
-  const onSubmit = (data: FormData) => {
-    setIsLoading(true)
+  const onSubmit = async (data: FormData) => {
     setSubmitError("")
     
-    // Simulate verification
-    setTimeout(() => {
-      setIsLoading(false)
+    try {
       const pin = data.code.join("")
-      
-      // Mock code verification (accept 123456 or any code for testing, show error for specific bad code if needed)
-      if (pin === "000000") {
-        setSubmitError("The verification code you entered is invalid or expired.")
-        return
-      }
+      await authService.verifyOtp(pin)
       
       setIsSuccess(true)
 
@@ -87,7 +80,9 @@ export function OtpForm() {
           router.push("/onboarding")
         }
       }, 1500)
-    }, 1500)
+    } catch (err: any) {
+      setSubmitError(err.message || "Invalid verification code.")
+    }
   }
 
   const isForgot = source === "forgot-password"
@@ -131,7 +126,7 @@ export function OtpForm() {
           <OtpInput
             value={field.value}
             onChange={field.onChange}
-            disabled={isLoading}
+            disabled={isSubmitting}
           />
         )}
       />
@@ -145,15 +140,15 @@ export function OtpForm() {
       {/* Submit Button */}
       <motion.button
         type="submit"
-        disabled={isLoading}
+        disabled={isSubmitting}
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
         className={cn(
           "w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-primary-blue text-white font-semibold shadow-lg shadow-blue-500/20 dark:shadow-none hover:shadow-blue-500/30 transition-all cursor-pointer disabled:opacity-50",
-          isLoading && "pointer-events-none"
+          isSubmitting && "pointer-events-none"
         )}
       >
-        {isLoading ? (
+        {isSubmitting ? (
           <Loader2 className="size-4 animate-spin" />
         ) : (
           <>
