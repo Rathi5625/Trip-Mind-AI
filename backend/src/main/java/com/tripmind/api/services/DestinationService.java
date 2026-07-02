@@ -9,6 +9,7 @@ import com.tripmind.api.exceptions.ResourceNotFoundException;
 import com.tripmind.api.repositories.DestinationRepository;
 import com.tripmind.api.repositories.UserRepository;
 import com.tripmind.api.repositories.WishlistRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
@@ -30,12 +31,14 @@ public class DestinationService {
         this.userRepository = userRepository;
     }
 
+    @Cacheable(value = "allDestinations")
     public List<DestinationDto> getAllDestinations() {
         return destinationRepository.findAll().stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "destinations", key = "#id")
     public DestinationDto getDestinationById(String id) {
         Destination destination = destinationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Destination not found with id: " + id));
