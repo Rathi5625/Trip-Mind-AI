@@ -46,7 +46,7 @@ public class DestinationService {
     }
 
     public List<DestinationDto> searchDestinations(String query) {
-        List<Destination> directResults = destinationRepository.findByNameContainingIgnoreCaseOrCountryContainingIgnoreCase(query, query);
+        List<Destination> directResults = destinationRepository.searchDestinationsFts(query);
         if (!directResults.isEmpty()) {
             return directResults.stream().map(this::mapToDto).collect(Collectors.toList());
         }
