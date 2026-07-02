@@ -34,3 +34,17 @@ app:
     api-key: ${GEMINI_API_KEY:}
   weather:
     api-key: ${WEATHER_API_KEY:}
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
