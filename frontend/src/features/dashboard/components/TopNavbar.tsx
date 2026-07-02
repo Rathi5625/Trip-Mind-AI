@@ -7,12 +7,14 @@ import { NotificationBell } from "./NotificationBell"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { GradientButton } from "@/components/ui/GradientButton"
 import { useDashboardStore } from "../hooks/useDashboard"
+import { useRouter } from "next/navigation"
 
 export function TopNavbar() {
   const { setSidebarOpen } = useDashboardStore()
+  const router = useRouter()
 
   const handleCreateTrip = () => {
-    alert("AI Trip Planner initiated! Designing your custom travel itinerary...")
+    router.push("/planner/create-trip/dates")
   }
 
   return (

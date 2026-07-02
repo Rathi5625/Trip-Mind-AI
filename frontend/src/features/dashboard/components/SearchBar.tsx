@@ -3,13 +3,24 @@
 import * as React from "react"
 import { Search, Sparkles } from "lucide-react"
 import { useDashboardStore } from "../hooks/useDashboard"
+import { useRouter } from "next/navigation"
 
 export function SearchBar() {
   const { searchQuery, setSearchQuery } = useDashboardStore()
   const [isFocused, setIsFocused] = React.useState(false)
 
+  const router = useRouter()
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/discover/search?q=${encodeURIComponent(searchQuery)}`)
+    }
+  }
+
   return (
-    <div
+    <form
+      onSubmit={handleSubmit}
       className={`relative flex items-center w-full max-w-xl rounded-full border border-black/5 bg-white/40 shadow-sm backdrop-blur-md transition-all duration-300 dark:border-white/5 dark:bg-slate-900/40 ${
         isFocused
           ? "ring-2 ring-primary-blue/35 border-transparent bg-white/80 dark:bg-slate-900/70"
@@ -34,6 +45,6 @@ export function SearchBar() {
       <div className="absolute right-3 flex items-center justify-center text-primary-blue/80 dark:text-blue-400/80 pointer-events-none">
         <Sparkles className="size-3.5 animate-[pulse_2s_infinite]" />
       </div>
-    </div>
+    </form>
   )
 }
