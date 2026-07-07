@@ -57,27 +57,36 @@ export function OtpForm() {
     return () => clearInterval(interval)
   }, [timerSeconds])
 
-  const handleResend = () => {
-    setTimerSeconds(60)
-    setSubmitError("")
-    toast.success("Verification code resent!")
+  const handleResend = async () => {
+    const email = searchParams.get("email") || ""
+    const type = source === "forgot-password" ? "RESET_PASSWORD" : "SIGNUP"
+    try {
+      await authService.resendOtp(email, type)
+      setTimerSeconds(60)
+      setSubmitError("")
+      toast.success("Verification code resent!")
+    } catch (err: any) {
+      toast.error(err.message || "Failed to resend code.")
+    }
   }
 
   const onSubmit = async (data: FormData) => {
     setSubmitError("")
+    const email = searchParams.get("email") || ""
     
     try {
       const pin = data.code.join("")
-      await authService.verifyOtp(pin)
+      await authService.verifyOtp(email, pin)
       
       setIsSuccess(true)
 
       // Redirect after success animation
       setTimeout(() => {
         if (source === "forgot-password") {
-          router.push("/reset-password")
+          router.push(`/reset-password?email=${encodeURIComponent(email)}&code=${pin}`)
         } else {
-          router.push("/onboarding")
+          toast.success("Email verified successfully! Please log in.")
+          router.push("/login")
         }
       }, 1500)
     } catch (err: any) {

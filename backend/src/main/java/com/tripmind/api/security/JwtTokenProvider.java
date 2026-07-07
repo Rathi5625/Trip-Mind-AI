@@ -68,6 +68,18 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public String generateRefreshTokenFromUserId(UUID userId) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + refreshTokenExpirationMs);
+
+        return Jwts.builder()
+                .subject(userId.toString())
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(key)
+                .compact();
+    }
+
     public UUID getUserIdFromJWT(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(key)

@@ -71,6 +71,11 @@ public class AuthService {
         User user = userRepository.findById(userPrincipal.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        if (!user.isVerified()) {
+            generateAndSaveOtp(user.getEmail(), "SIGNUP");
+            throw new BadRequestException("Please verify your email address first. A new verification OTP code has been sent to your inbox.");
+        }
+
         UserDto userDto = UserDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -187,6 +192,8 @@ public class AuthService {
 
     @Transactional
     public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
+        verifyOtp(resetPasswordRequest.getEmail(), resetPasswordRequest.getCode(), "RESET_PASSWORD");
+
         User user = userRepository.findByEmail(resetPasswordRequest.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 

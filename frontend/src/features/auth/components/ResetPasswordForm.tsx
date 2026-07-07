@@ -7,6 +7,8 @@ import { z } from "zod"
 import { motion } from "framer-motion"
 import { Eye, EyeOff, ArrowRight, Loader2, CheckCircle2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useSearchParams } from "next/navigation"
+import { toast } from "react-hot-toast"
 import { PasswordStrength } from "./PasswordStrength"
 import { BackToLogin } from "./BackToLogin"
 import { authService } from "@/services/auth.service"
@@ -31,6 +33,10 @@ const schema = z
 type FormData = z.infer<typeof schema>
 
 export function ResetPasswordForm() {
+  const searchParams = useSearchParams()
+  const email = searchParams.get("email") || ""
+  const code = searchParams.get("code") || ""
+
   const [showPassword, setShowPassword] = React.useState(false)
   const [isSuccess, setIsSuccess] = React.useState(false)
   const [isLoading, setIsLoading] = React.useState(false)
@@ -52,12 +58,18 @@ export function ResetPasswordForm() {
   const passwordValue = watch("password")
 
   const onSubmit = async (data: FormData) => {
+    if (!email || !code) {
+      toast.error("Invalid reset link. Please request a new verification code.")
+      return
+    }
+
     setIsLoading(true)
     try {
-      await authService.resetPassword("user@example.com") // Simulate using email passed down/from context
+      await authService.confirmResetPassword(email, data.password, code)
       setIsSuccess(true)
+      toast.success("Password reset successfully!")
     } catch (err: any) {
-      // toast.error(...) handled if needed
+      toast.error(err.message || "Failed to update password.")
     } finally {
       setIsLoading(false)
     }

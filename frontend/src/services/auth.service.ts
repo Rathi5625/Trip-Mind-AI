@@ -11,14 +11,24 @@ export const authService = {
     return apiClient.post('/api/auth/signup', data);
   },
 
-  verifyOtp: async (otp: string): Promise<boolean> => {
-    const email = useAuthStore.getState().user?.email || "traveler@tripmind.ai";
-    const response = await apiClient.post<any, any>('/api/auth/verify-otp', { email, code: otp });
+  verifyOtp: async (email: string, otp: string, source: string = "signup"): Promise<boolean> => {
+    const endpoint = source === "forgot-password" ? "/api/auth/verify-reset-otp" : "/api/auth/verify-otp";
+    const response = await apiClient.post<any, any>(endpoint, { email, code: otp });
+    return response.success;
+  },
+
+  resendOtp: async (email: string, type: string): Promise<boolean> => {
+    const response = await apiClient.post<any, any>('/api/auth/resend-otp', { email, type });
     return response.success;
   },
 
   resetPassword: async (email: string): Promise<boolean> => {
     const response = await apiClient.post<any, any>('/api/auth/forgot-password', { email });
+    return response.success;
+  },
+
+  confirmResetPassword: async (email: string, password: string, code: string): Promise<boolean> => {
+    const response = await apiClient.post<any, any>('/api/auth/reset-password', { email, password, code });
     return response.success;
   },
 

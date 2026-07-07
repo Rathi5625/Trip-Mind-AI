@@ -35,6 +35,17 @@ public class AuthController {
         return ResponseEntity.ok(new ApiResponse(true, "OTP verified successfully."));
     }
 
+    @PostMapping("/resend-otp")
+    public ResponseEntity<ApiResponse> resendOtp(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String type = request.get("type");
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Email is required."));
+        }
+        authService.generateAndSaveOtp(email, type != null ? type.toUpperCase() : "SIGNUP");
+        return ResponseEntity.ok(new ApiResponse(true, "Verification OTP code has been resent."));
+    }
+
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse> forgotPassword(@RequestBody Map<String, String> request) {
         String email = request.get("email");

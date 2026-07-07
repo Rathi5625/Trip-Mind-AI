@@ -18,4 +18,8 @@ public class ResetPasswordRequest {
     @NotBlank(message = "Password must not be blank")
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
+
+    @NotBlank(message = "Verification code must not be blank")
+    @Size(min = 6, max = 6, message = "Verification code must be exactly 6 characters")
+    private String code;
 }

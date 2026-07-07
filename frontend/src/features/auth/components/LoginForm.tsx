@@ -119,7 +119,7 @@ export function LoginForm() {
           <span>Remember Me</span>
         </label>
         <Link
-          href="/reset-password"
+          href="/forgot-password"
           className="font-bold text-primary-blue dark:text-blue-400 hover:underline"
         >
           Forgot Password?

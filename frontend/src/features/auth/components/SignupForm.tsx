@@ -57,10 +57,9 @@ export function SignupForm() {
 
   const onSubmit = async (data: SignupValues) => {
     try {
-      const response = await authService.signup(data)
-      login(response.user, response.token)
-      toast.success("Account created successfully!")
-      router.push("/onboarding") // Redirect to Onboarding on successful signup
+      await authService.signup(data)
+      toast.success("Account created! Please check your email for the verification code.")
+      router.push(`/verify-otp?email=${encodeURIComponent(data.email)}&source=signup`)
     } catch (err: any) {
       toast.error(err.message || "Failed to create account")
     }
