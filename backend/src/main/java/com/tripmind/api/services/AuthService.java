@@ -20,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Random;
@@ -34,19 +36,22 @@ public class AuthService {
     private final OtpRepository otpRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
+    private final JavaMailSender mailSender;
 
     public AuthService(AuthenticationManager authenticationManager,
                        UserRepository userRepository,
                        RoleRepository roleRepository,
                        OtpRepository otpRepository,
                        PasswordEncoder passwordEncoder,
-                       JwtTokenProvider tokenProvider) {
+                       JwtTokenProvider tokenProvider,
+                       JavaMailSender mailSender) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.otpRepository = otpRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
+        this.mailSender = mailSender;
     }
 
     public JwtAuthenticationResponse login(LoginRequest loginRequest) {
@@ -131,6 +136,18 @@ public class AuthService {
                 .build();
 
         otpRepository.save(otp);
+
+        // Try sending email via SMTP
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("Trip Mind AI - Verification Code");
+            message.setText("Hello,\n\nYour Trip Mind AI verification code is: " + code + "\n\nThis code will expire in 10 minutes.\n\nHappy travels,\nTrip Mind AI Team");
+            mailSender.send(message);
+            System.out.println("====== SUCCESS: OTP SENT TO EMAIL " + email + " ======");
+        } catch (Exception e) {
+            System.err.println("====== ERROR SENDING OTP TO EMAIL " + email + ": " + e.getMessage() + " ======");
+        }
     }
 
     @Transactional
