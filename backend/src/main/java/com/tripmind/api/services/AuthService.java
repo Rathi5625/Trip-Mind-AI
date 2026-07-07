@@ -169,8 +169,10 @@ public class AuthService {
             throw new BadRequestException("Invalid OTP code.");
         }
 
-        // Remove OTP record upon successful match
-        otpRepository.delete(otp);
+        // Remove OTP record upon successful match (except for RESET_PASSWORD, which is verified again on update)
+        if (!"RESET_PASSWORD".equalsIgnoreCase(type)) {
+            otpRepository.delete(otp);
+        }
 
         if ("SIGNUP".equalsIgnoreCase(type)) {
             User user = userRepository.findByEmail(email)
@@ -199,6 +201,9 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(resetPasswordRequest.getPassword()));
         userRepository.save(user);
+
+        // Delete the RESET_PASSWORD OTP from database after successful reset
+        otpRepository.deleteByEmailAndType(resetPasswordRequest.getEmail(), "RESET_PASSWORD");
     }
 
     public JwtAuthenticationResponse refreshAccessToken(String refreshToken) {
