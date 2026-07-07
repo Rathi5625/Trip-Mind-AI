@@ -26,36 +26,38 @@ public class OpenWeatherProvider implements WeatherProvider {
     @Override
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getForecast(String destination, int days) {
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            logger.warn("OpenWeather API key is not set. Falling back to mock data.");
+        if (apiKey == null || apiKey.trim().isEmpty() || "your_weather_api_key_here".equals(apiKey)) {
+            logger.warn("WeatherAPI key is not set. Falling back to mock data.");
             return getMockForecast(days);
         }
 
         try {
-            String url = "https://api.openweathermap.org/data/2.5/forecast?q=" + destination + "&units=metric&appid=" + apiKey;
+            // Using weatherapi.com endpoint as configured in the project .env
+            String url = "https://api.weatherapi.com/v1/forecast.json?key=" + apiKey + "&q=" + destination + "&days=" + days;
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
 
-            if (response != null && response.containsKey("list")) {
-                List<Map<String, Object>> list = (List<Map<String, Object>>) response.get("list");
+            if (response != null && response.containsKey("forecast")) {
+                Map<String, Object> forecast = (Map<String, Object>) response.get("forecast");
+                List<Map<String, Object>> forecastday = (List<Map<String, Object>>) forecast.get("forecastday");
                 List<Map<String, Object>> parsedForecast = new ArrayList<>();
-                
-                int limit = Math.min(days, list.size());
+
+                int limit = Math.min(days, forecastday.size());
                 for (int i = 0; i < limit; i++) {
-                    Map<String, Object> forecastItem = list.get(i);
-                    Map<String, Object> main = (Map<String, Object>) forecastItem.get("main");
-                    List<Map<String, Object>> weather = (List<Map<String, Object>>) forecastItem.get("weather");
+                    Map<String, Object> forecastDayItem = forecastday.get(i);
+                    Map<String, Object> dayInfo = (Map<String, Object>) forecastDayItem.get("day");
+                    Map<String, Object> condition = dayInfo != null ? (Map<String, Object>) dayInfo.get("condition") : null;
 
                     Map<String, Object> day = new HashMap<>();
                     day.put("dayOffset", i);
-                    day.put("tempMax", main != null ? main.get("temp_max") : 25.0);
-                    day.put("tempMin", main != null ? main.get("temp_min") : 15.0);
-                    day.put("conditionText", (weather != null && !weather.isEmpty()) ? weather.get(0).get("main") : "Clear");
+                    day.put("tempMax", dayInfo != null ? dayInfo.get("maxtemp_c") : 25.0);
+                    day.put("tempMin", dayInfo != null ? dayInfo.get("mintemp_c") : 15.0);
+                    day.put("conditionText", condition != null ? condition.get("text") : "Clear");
                     parsedForecast.add(day);
                 }
                 return parsedForecast;
             }
         } catch (Exception e) {
-            logger.error("Failed to fetch weather forecast from OpenWeather, falling back: {}", e.getMessage());
+            logger.error("Failed to fetch weather forecast from WeatherAPI, falling back: {}", e.getMessage());
         }
 
         return getMockForecast(days);
