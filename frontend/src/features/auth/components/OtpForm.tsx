@@ -76,7 +76,7 @@ export function OtpForm() {
     
     try {
       const pin = data.code.join("")
-      await authService.verifyOtp(email, pin)
+      await authService.verifyOtp(email, pin, source)
       
       setIsSuccess(true)
 
