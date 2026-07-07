@@ -30,36 +30,37 @@ public class AiService {
         long durationDays = ChronoUnit.DAYS.between(trip.getStartDate(), trip.getEndDate()) + 1;
         String prompt = String.format(
                 "Act as a professional AI travel planner. Create a detailed day-by-day itinerary for %s.\n" +
-                "Trip Details:\n" +
-                "- Duration: %d days\n" +
-                "- Start Date: %s\n" +
-                "- Budget Category: %s\n" +
-                "- Travelers Count: %d\n" +
-                "- Pace: %s\n\n" +
-                "You MUST respond ONLY with a raw JSON array matching this structure. Do not include markdown codeblocks like ```json or any other text. Here is the JSON schema:\n" +
-                "[\n" +
-                "  {\n" +
-                "    \"dayNumber\": 1,\n" +
-                "    \"description\": \"Day description highlighting what to do.\",\n" +
-                "    \"transportations\": [\n" +
-                "      {\n" +
-                "        \"type\": \"WALK or TAXI or BUS or TRAIN or FLIGHT\",\n" +
-                "        \"origin\": \"Starting point/Hotel\",\n" +
-                "        \"destination\": \"Sightseeing attraction name\",\n" +
-                "        \"departureTime\": \"HH:MM AM/PM\",\n" +
-                "        \"arrivalTime\": \"HH:MM AM/PM\",\n" +
-                "        \"cost\": 15.0,\n" +
-                "        \"duration\": \"30m or 1h\"\n" +
-                "      }\n" +
-                "    ]\n" +
-                "  }\n" +
-                "]",
-                trip.getDestinationName(), durationDays, trip.getStartDate(), trip.getBudgetCategory(), trip.getTravelersCount(), trip.getPace()
-        );
+                        "Trip Details:\n" +
+                        "- Duration: %d days\n" +
+                        "- Start Date: %s\n" +
+                        "- Budget Category: %s\n" +
+                        "- Travelers Count: %d\n" +
+                        "- Pace: %s\n\n" +
+                        "You MUST respond ONLY with a raw JSON array matching this structure. Do not include markdown codeblocks like ```json or any other text. Here is the JSON schema:\n"
+                        +
+                        "[\n" +
+                        "  {\n" +
+                        "    \"dayNumber\": 1,\n" +
+                        "    \"description\": \"Day description highlighting what to do.\",\n" +
+                        "    \"transportations\": [\n" +
+                        "      {\n" +
+                        "        \"type\": \"WALK or TAXI or BUS or TRAIN or FLIGHT\",\n" +
+                        "        \"origin\": \"Starting point/Hotel\",\n" +
+                        "        \"destination\": \"Sightseeing attraction name\",\n" +
+                        "        \"departureTime\": \"HH:MM AM/PM\",\n" +
+                        "        \"arrivalTime\": \"HH:MM AM/PM\",\n" +
+                        "        \"cost\": 15.0,\n" +
+                        "        \"duration\": \"30m or 1h\"\n" +
+                        "      }\n" +
+                        "    ]\n" +
+                        "  }\n" +
+                        "]",
+                trip.getDestinationName(), durationDays, trip.getStartDate(), trip.getBudgetCategory(),
+                trip.getTravelersCount(), trip.getPace());
 
         try {
             String rawOutput = geminiClientService.generateText(prompt);
-            
+
             // Clean markdown wrappers if returned
             String cleanJson = rawOutput.trim();
             if (cleanJson.startsWith("```")) {
@@ -70,7 +71,9 @@ public class AiService {
             }
             cleanJson = cleanJson.trim();
 
-            List<Map<String, Object>> daysList = objectMapper.readValue(cleanJson, new TypeReference<List<Map<String, Object>>>() {});
+            List<Map<String, Object>> daysList = objectMapper.readValue(cleanJson,
+                    new TypeReference<List<Map<String, Object>>>() {
+                    });
             List<TripDay> days = new ArrayList<>();
             LocalDate currentDate = trip.getStartDate();
 
