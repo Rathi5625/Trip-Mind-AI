@@ -1,119 +1,71 @@
-import { Destination, HiddenGem, TrendingItem } from "../types/discover"
+﻿import { Destination, HiddenGem, TrendingItem } from "../types/discover"
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+
+const getDestinationImage = async (name: string): Promise<string> => {
+  try {
+    const res = await fetch(`${API_BASE}/api/ai-chat/image?q=${encodeURIComponent(name + " travel")}`)
+    if (res.ok) { const d = await res.json(); return d.imageUrl }
+  } catch (_) {}
+  return "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80"
+}
+
+const authHeaders = (): HeadersInit => {
+  const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
 
 export const getRecommendedDestinations = async (): Promise<Destination[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 100))
-  return [
-    {
-      id: "tokyo",
-      name: "Tokyo",
-      country: "Japan",
-      imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&w=800&q=80",
-      matchScore: 97,
-      description: "A neon-lit synthesis of futuristic skyscrapers and serene centuries-old temples.",
-      budget: 1800,
-      bestSeason: "Spring / Autumn"
-    },
-    {
-      id: "bali",
-      name: "Bali",
-      country: "Indonesia",
-      imageUrl: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80",
-      matchScore: 92,
-      description: "Pristine beaches, terraced rice paddies, wellness ashrams, and active volcanos.",
-      budget: 950,
-      bestSeason: "April - September"
-    },
-    {
-      id: "amalfi",
-      name: "Amalfi Coast",
-      country: "Italy",
-      imageUrl: "https://images.unsplash.com/photo-1563841930606-67e2b64a897e?auto=format&fit=crop&w=800&q=80",
-      matchScore: 89,
-      description: "Clifftop pastel villages overlooking the cobalt Tyrrhenian Sea and lemon groves.",
-      budget: 2200,
-      bestSeason: "May - October"
-    },
-    {
-      id: "kyoto",
-      name: "Kyoto",
-      country: "Japan",
-      imageUrl: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80",
-      matchScore: 87,
-      description: "Traditional wooden houses, imperial gardens, and legendary bamboo forests.",
-      budget: 1600,
-      bestSeason: "Cherry Blossom season"
+  try {
+    const res = await fetch(`${API_BASE}/api/destinations?cat=recommended`, { headers: authHeaders() })
+    if (res.ok) {
+      const data = await res.json()
+      if (Array.isArray(data) && data.length > 0) {
+        return await Promise.all(data.map(async (d: Destination) => ({ ...d, imageUrl: d.imageUrl || await getDestinationImage(`${d.name} ${d.country}`) })))
+      }
     }
+  } catch (e) { console.warn("[discover] Backend unavailable:", e) }
+  const list = [
+    { id: "tokyo", name: "Tokyo", country: "Japan", matchScore: 97, description: "A neon-lit synthesis of futuristic skyscrapers and centuries-old temples.", budget: 1800, bestSeason: "Spring / Autumn" },
+    { id: "bali", name: "Bali", country: "Indonesia", matchScore: 92, description: "Pristine beaches, rice paddies, wellness ashrams, and active volcanos.", budget: 950, bestSeason: "April - September" },
+    { id: "paris", name: "Paris", country: "France", matchScore: 89, description: "Iconic boulevards, world-class art, and legendary gastronomy.", budget: 2200, bestSeason: "May - October" },
+    { id: "kyoto", name: "Kyoto", country: "Japan", matchScore: 87, description: "Traditional wooden houses, imperial gardens, and bamboo forests.", budget: 1600, bestSeason: "Cherry Blossom season" },
   ]
+  return await Promise.all(list.map(async (d) => ({ ...d, imageUrl: await getDestinationImage(`${d.name} ${d.country}`) })))
 }
 
 export const getHiddenGems = async (): Promise<HiddenGem[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 100))
-  return [
-    {
-      id: "faroe",
-      name: "Faroe Islands",
-      country: "Denmark",
-      imageUrl: "https://images.unsplash.com/photo-1527004013197-933c4bb611b3?auto=format&fit=crop&w=800&q=80",
-      description: "Dramatic green basalt cliffs, sweeping waterfalls, and tiny puffin-populated villages.",
-      discoveryScore: 98,
-      cost: 1650,
-      duration: "6 Days"
-    },
-    {
-      id: "parisnight",
-      name: "Paris at Night",
-      country: "France",
-      imageUrl: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80",
-      description: "Explore secret backstreets, candle-lit wine bars, and illuminated bridges without the day crowds.",
-      discoveryScore: 94,
-      cost: 1200,
-      duration: "3 Days"
-    },
-    {
-      id: "cappadocia",
-      name: "Cappadocia Caves",
-      country: "Turkey",
-      imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
-      description: "Stunning geological formations, cave stays, and hot air balloon panoramic flights.",
-      discoveryScore: 91,
-      cost: 850,
-      duration: "4 Days"
+  try {
+    const res = await fetch(`${API_BASE}/api/destinations?cat=hidden_gems`, { headers: authHeaders() })
+    if (res.ok) {
+      const data = await res.json()
+      if (Array.isArray(data) && data.length > 0) {
+        return await Promise.all(data.map(async (d: HiddenGem) => ({ ...d, imageUrl: d.imageUrl || await getDestinationImage(`${d.name} ${d.country}`) })))
+      }
     }
+  } catch (e) { console.warn("[discover] Backend unavailable:", e) }
+  const list = [
+    { id: "faroe", name: "Faroe Islands", country: "Denmark", description: "Dramatic basalt cliffs, sweeping waterfalls, and puffin-populated villages.", discoveryScore: 98, cost: 1650, duration: "6 Days" },
+    { id: "cappadocia", name: "Cappadocia", country: "Turkey", description: "Geological formations, cave hotels, and hot air balloon panoramic flights.", discoveryScore: 94, cost: 850, duration: "4 Days" },
+    { id: "azores", name: "Azores", country: "Portugal", description: "Volcanic islands with crater lakes, thermal spas, and whale watching.", discoveryScore: 91, cost: 1100, duration: "5 Days" },
   ]
+  return await Promise.all(list.map(async (d) => ({ ...d, imageUrl: await getDestinationImage(`${d.name} ${d.country}`) })))
 }
 
 export const getTrendingThisMonth = async (): Promise<TrendingItem[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 100))
-  return [
-    {
-      id: "lisbon",
-      name: "Lisbon",
-      country: "Portugal",
-      imageUrl: "https://images.unsplash.com/photo-1509840144374-4c69d3873691?auto=format&fit=crop&w=800&q=80",
-      popularityScore: 98,
-      growthPercentage: 24,
-      avgTemp: "22°C",
-      bestMonth: "September"
-    },
-    {
-      id: "capetown",
-      name: "Cape Town",
-      country: "South Africa",
-      imageUrl: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=800&q=80",
-      popularityScore: 95,
-      growthPercentage: 18,
-      avgTemp: "25°C",
-      bestMonth: "November"
-    },
-    {
-      id: "oahu",
-      name: "Oahu",
-      country: "Hawaii",
-      imageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
-      popularityScore: 91,
-      growthPercentage: 12,
-      avgTemp: "28°C",
-      bestMonth: "May"
+  try {
+    const res = await fetch(`${API_BASE}/api/destinations?cat=trending`, { headers: authHeaders() })
+    if (res.ok) {
+      const data = await res.json()
+      if (Array.isArray(data) && data.length > 0) {
+        return await Promise.all(data.map(async (d: TrendingItem) => ({ ...d, imageUrl: d.imageUrl || await getDestinationImage(`${d.name} ${d.country}`) })))
+      }
     }
+  } catch (e) { console.warn("[discover] Backend unavailable:", e) }
+  const list = [
+    { id: "lisbon", name: "Lisbon", country: "Portugal", popularityScore: 98, growthPercentage: 24, avgTemp: "22C", bestMonth: "September" },
+    { id: "capetown", name: "Cape Town", country: "South Africa", popularityScore: 95, growthPercentage: 18, avgTemp: "25C", bestMonth: "November" },
+    { id: "oahu", name: "Oahu", country: "Hawaii", popularityScore: 91, growthPercentage: 12, avgTemp: "28C", bestMonth: "May" },
   ]
+  return await Promise.all(list.map(async (d) => ({ ...d, imageUrl: await getDestinationImage(`${d.name} ${d.country}`) })))
 }

@@ -1,4 +1,26 @@
-import { Destination } from "../types/destination"
+﻿import { Destination } from "../types/destination"
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+
+const getDestinationImage = async (name: string): Promise<string> => {
+  try {
+    const res = await fetch(`${API_BASE}/api/ai-chat/image?q=${encodeURIComponent(name + " travel destination")}`)
+    if (res.ok) {
+      const d = await res.json()
+      return d.imageUrl
+    }
+  } catch (_) {}
+  return "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=600&q=80"
+}
+
+export const loadOnboardingDestinations = async (): Promise<Destination[]> => {
+  return await Promise.all(
+    DEFAULT_DESTINATIONS.map(async (d) => ({
+      ...d,
+      imageUrl: await getDestinationImage(d.name),
+    }))
+  )
+}
 
 export const DEFAULT_DESTINATIONS: Destination[] = [
   {
@@ -146,3 +168,5 @@ export const DEFAULT_DESTINATIONS: Destination[] = [
     categories: ["mountains", "nature", "backpacking"],
   },
 ]
+
+export const ONBOARDING_DESTINATIONS = DEFAULT_DESTINATIONS

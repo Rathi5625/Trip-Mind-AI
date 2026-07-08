@@ -4,6 +4,7 @@ import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, X, Send, Bot, Compass, Heart, ArrowRight } from "lucide-react"
 import { useDashboardStore } from "../hooks/useDashboard"
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
 
 export function FloatingAIAssistant() {
   const { isAIOpen, setAIOpen } = useDashboardStore()
@@ -14,33 +15,66 @@ export function FloatingAIAssistant() {
     },
   ])
   const [inputVal, setInputVal] = React.useState("")
+  const [isLoading, setIsLoading] = React.useState(false)
   const chatEndRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
     if (isAIOpen) {
       chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }
-  }, [messages, isAIOpen])
+  }, [messages, isAIOpen, isLoading])
 
-  const handleSendMessage = () => {
-    if (!inputVal.trim()) return
+  const handleSendMessage = async () => {
+    if (!inputVal.trim() || isLoading) return
 
-    const userMsg = { sender: "user", text: inputVal }
+    const userQuery = inputVal
+    const userMsg = { sender: "user", text: userQuery }
     setMessages((prev) => [...prev, userMsg])
     setInputVal("")
+    setIsLoading(true)
 
-    // Simulated AI response
-    setTimeout(() => {
-      let reply = "That sounds amazing! Let me analyze seasonal travel deals and build a custom itinerary preview for you."
-      if (inputVal.toLowerCase().includes("bali")) {
-        reply = "Bali is a tropical paradise! I see flights are 18% cheaper this week. Would you like me to book your hotel near Uluwatu?"
-      } else if (inputVal.toLowerCase().includes("switzerland")) {
-        reply = "Switzerland is pristine! The optimal season starts next month. I can plan a scenic train route across Lucerne and Zermatt."
-      } else if (inputVal.toLowerCase().includes("tokyo")) {
-        reply = "Tokyo is ready! You have 12 days to go. Should we add a ramen exploration food crawl in Shinjuku to your itinerary?"
+    // Build chat history for model context
+    const historyText = messages
+      .map((m) => `${m.sender === "ai" ? "VoyageAI" : "User"}: ${m.text}`)
+      .join("\n")
+
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
       }
-      setMessages((prev) => [...prev, { sender: "ai", text: reply }])
-    }, 1000)
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`
+      }
+
+      const res = await fetch(`${API_BASE}/api/ai-chat`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          message: userQuery,
+          tripId: "None",
+          history: historyText,
+        }),
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        setMessages((prev) => [...prev, { sender: "ai", text: data.reply || "No response received." }])
+      } else {
+        throw new Error("Chat request failed")
+      }
+    } catch (e) {
+      console.error("[FloatingAIAssistant] Error sending chat:", e)
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: "I'm having trouble connecting right now. Please make sure the backend is active.",
+        },
+      ])
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -109,6 +143,15 @@ export function FloatingAIAssistant() {
                   </div>
                 </div>
               ))}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="max-w-[80%] rounded-2xl px-3 py-2 text-xs leading-relaxed font-semibold bg-slate-50 text-slate-400 border border-black/5 dark:bg-slate-800/50 dark:text-slate-400 dark:border-white/5 rounded-bl-none flex items-center gap-1.5">
+                    <span className="size-1.5 rounded-full bg-slate-400 dark:bg-slate-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="size-1.5 rounded-full bg-slate-400 dark:bg-slate-500 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="size-1.5 rounded-full bg-slate-400 dark:bg-slate-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              )}
               <div ref={chatEndRef} />
             </div>
 

@@ -1,75 +1,65 @@
-import { GeneratedTripInfo } from "../types/generatedTrip"
+﻿import { GeneratedTripInfo } from "../types/generatedTrip"
 
-export const getGeneratedTripDetails = async (
-  destination: string
-): Promise<GeneratedTripInfo> => {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 150))
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
 
-  const destLower = destination.toLowerCase()
-  if (destLower.includes("tokyo")) {
-    return {
-      destinationName: "Modern Tokyo & Kyoto",
-      subtitle: "Urban Exploration",
-      description: "A perfectly optimized curation of bullet train transits, boutique hotels, Ginza culinary sessions, and historical shrine tours.",
-      duration: "7 Days",
-      imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&w=800&q=80",
-      totalBudget: 3500,
-      flightsPercentage: 45,
-      staysPercentage: 30,
-      savedLocationsCount: 16,
-      weatherAlert: "Expect clear skies with cool evenings. Perfect season for walking tours.",
-      diningSuggestion: "Book 'Sukiyabashi Jiro' 4 weeks in advance. Added to itinerary.",
-      placesCount: 48,
-      restaurantsCount: 22,
-      hotelsComparedCount: 8,
-      transportRoutesCount: 12,
-      savedAmount: 420,
-      matchScore: 98,
-      personalizedMessage: "Hi Parth!\n\nBased on your interest in metropolitan culture, Michelin culinary stops, and fast pacing, I've built a 7-day Tokyo itinerary covering Ginza shopping, Shibuya Sky, and automated train timings."
+const getDestinationImage = async (name: string): Promise<string> => {
+  try {
+    const res = await fetch(`${API_BASE}/api/ai-chat/image?q=${encodeURIComponent(name + " travel aerial")}`)
+    if (res.ok) { const d = await res.json(); return d.imageUrl }
+  } catch (_) {}
+  return "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80"
+}
+
+export const getGeneratedTripDetails = async (destination: string): Promise<GeneratedTripInfo> => {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null
+    const headers: HeadersInit = token ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" }
+
+    // Ask the AI copilot for a quick trip summary card for this destination
+    const chatRes = await fetch(`${API_BASE}/api/ai-chat`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        message: `Generate a brief trip summary card for ${destination}. Return a JSON object with: destinationName (string), subtitle (string, 2-3 words like "Cultural Immersion"), description (string, max 120 chars), duration (string like "7 Days"), totalBudget (number in USD), flightsPercentage (integer), staysPercentage (integer), savedLocationsCount (integer), weatherAlert (string), diningSuggestion (string), placesCount (integer), restaurantsCount (integer), hotelsComparedCount (integer), transportRoutesCount (integer), savedAmount (integer), matchScore (integer 90-99), personalizedMessage (string). Respond ONLY with valid raw JSON.`,
+        tripId: "planner",
+      }),
+    })
+
+    if (chatRes.ok) {
+      const chatData = await chatRes.json()
+      const raw = chatData.reply || ""
+      const cleaned = raw.replace(/```json/g, "").replace(/```/g, "").trim()
+      const start = cleaned.indexOf("{")
+      const end = cleaned.lastIndexOf("}")
+      if (start >= 0 && end > start) {
+        const parsed = JSON.parse(cleaned.substring(start, end + 1))
+        const imageUrl = await getDestinationImage(destination)
+        return { ...parsed, imageUrl }
+      }
     }
-  } else if (destLower.includes("paris")) {
-    return {
-      destinationName: "Romantic Paris Escape",
-      subtitle: "Arts & Culture",
-      description: "An optimized romance-filled travel itinerary featuring Louvre museum tours, Seine sunset dinner cruises, and boutique hotel stays.",
-      duration: "5 Days",
-      imageUrl: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80",
-      totalBudget: 2900,
-      flightsPercentage: 40,
-      staysPercentage: 35,
-      savedLocationsCount: 10,
-      weatherAlert: "Expect light rain on day 2. Indoor museum activities scheduled.",
-      diningSuggestion: "Book 'Le Jules Verne' in Eiffel Tower 3 weeks in advance. Added.",
-      placesCount: 36,
-      restaurantsCount: 14,
-      hotelsComparedCount: 6,
-      transportRoutesCount: 8,
-      savedAmount: 350,
-      matchScore: 95,
-      personalizedMessage: "Hi Parth!\n\nBased on your passion for romantic art, historic architecture, and relaxed boutique hotel pacing, I've curated a 5-day Parisian getaway with Eiffel Tower reservations and quiet Seine dinner cruises."
-    }
+  } catch (e) {
+    console.warn("[generatedTrip] AI summary failed:", e)
   }
 
-  // Default is Bali (mockup matching screenshot exactly!)
+  // Graceful fallback with live image
   return {
-    destinationName: "Coastal Escape: Bali",
-    subtitle: "Ubud & Uluwatu",
-    description: "A perfectly balanced mix of relaxation and adventure, featuring hidden beaches, local culinary, and wellness spa spots.",
+    destinationName: destination,
+    subtitle: "AI Travel Plan",
+    description: "Your personalized AI-generated itinerary is ready. Explore curated experiences tailored to your preferences.",
     duration: "7 Days",
-    imageUrl: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80",
-    totalBudget: 2450,
+    imageUrl: await getDestinationImage(destination),
+    totalBudget: 2500,
     flightsPercentage: 40,
     staysPercentage: 35,
     savedLocationsCount: 12,
-    weatherAlert: "Expect light rain on day 3. We've automatically scheduled indoor cultural activities.",
-    diningSuggestion: "Book 'Locavore' 2 weeks in advance. Added to your action items.",
-    placesCount: 42,
-    restaurantsCount: 18,
-    hotelsComparedCount: 5,
-    transportRoutesCount: 9,
-    savedAmount: 380,
-    matchScore: 97,
-    personalizedMessage: "Hi Parth!\n\nBased on your love for culture, local cuisine, and balanced travel, I've created a 7-day Bali itinerary featuring hidden beaches, authentic restaurants, and optimized travel times to avoid crowds."
+    weatherAlert: "Check real-time weather before departure.",
+    diningSuggestion: "Explore local restaurants recommended by VoyageAI.",
+    placesCount: 30,
+    restaurantsCount: 15,
+    hotelsComparedCount: 6,
+    transportRoutesCount: 8,
+    savedAmount: 300,
+    matchScore: 95,
+    personalizedMessage: `Your AI-generated ${destination} itinerary is ready. Tap any day to explore activities, restaurants, and hidden gems curated just for you.`,
   }
 }
