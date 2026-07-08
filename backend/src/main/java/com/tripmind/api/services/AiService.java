@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripmind.api.entities.Trip;
 import com.tripmind.api.entities.TripDay;
 import com.tripmind.api.entities.Transportation;
-import com.tripmind.api.services.ai.GeminiClientService;
+import com.tripmind.api.services.ai.AiProviderRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -17,11 +17,11 @@ import java.util.*;
 public class AiService {
 
     private static final Logger logger = LoggerFactory.getLogger(AiService.class);
-    private final GeminiClientService geminiClientService;
+    private final AiProviderRouter aiProviderRouter;
     private final ObjectMapper objectMapper;
 
-    public AiService(GeminiClientService geminiClientService, ObjectMapper objectMapper) {
-        this.geminiClientService = geminiClientService;
+    public AiService(AiProviderRouter aiProviderRouter, ObjectMapper objectMapper) {
+        this.aiProviderRouter = aiProviderRouter;
         this.objectMapper = objectMapper;
     }
 
@@ -59,7 +59,7 @@ public class AiService {
                 trip.getTravelersCount(), trip.getPace());
 
         try {
-            String rawOutput = geminiClientService.generateText(prompt);
+            String rawOutput = aiProviderRouter.generateText(prompt);
 
             // Clean markdown wrappers if returned
             String cleanJson = rawOutput.trim();
@@ -114,7 +114,7 @@ public class AiService {
             return days;
 
         } catch (Exception e) {
-            logger.warn("Failed to generate AI itinerary via Gemini, falling back to mock: {}", e.getMessage());
+            logger.warn("Failed to generate AI itinerary, falling back to mock: {}", e.getMessage());
         }
 
         return getLocalFallbackItinerary(trip);

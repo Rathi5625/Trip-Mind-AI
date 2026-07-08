@@ -87,13 +87,9 @@ public class GeminiClientService {
     }
 
     private String getFallbackResponse(String prompt) {
-        String query = prompt.toLowerCase();
-        if (query.contains("tokyo") || query.contains("japan")) {
-            return "### Fallback AI Output: Tokyo Highlights\n- Visit Shibuya Crossing at 09:00 AM\n- Sushi lunch in Tsukiji Market\n- Evening sunset at Tokyo Skytree.";
-        }
-        if (query.contains("swiss") || query.contains("swiss alps") || query.contains("switzerland")) {
-            return "### Fallback AI Output: Swiss Alps Highlights\n- Board Lake Lucerne steamer at 09:30 AM\n- Mountain sledding at Mt. Pilatus\n- Traditional cheese fondue dinner.";
-        }
-        return "### Fallback AI Travel Guide\n- Explore local markets and sights\n- Try traditional street food\n- Take scenic walking routes.";
+        // No hardcoded responses — return a graceful message that the AI is temporarily unavailable.
+        // The router will already have tried all providers before reaching this point.
+        return "I'm currently unable to connect to the AI service. Please check your API key configuration " +
+               "or try again in a moment. If you need immediate help, contact support.";
     }
 }
