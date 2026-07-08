@@ -45,6 +45,13 @@ app:
     refreshTokenExpirationMs: 604800000 # 7 days
   gemini:
     api-key: ${GEMINI_API_KEY:}
+  nvidia:
+    api-key: ${NVIDIA_API_KEY:}
+    image-api-key: ${NVIDIA_IMAGE_API_KEY:}
+  unsplash:
+    access-key: ${UNSPLASH_ACCESS_KEY:}
+  tavily:
+    api-key: ${TAVILY_API_KEY:}
   weather:
     api-key: ${WEATHER_API_KEY:}
   data:
