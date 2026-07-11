@@ -4,14 +4,22 @@ import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, X, Send, Bot, Compass, Heart, ArrowRight } from "lucide-react"
 import { useDashboardStore } from "../hooks/useDashboard"
+import { useRouter } from "next/navigation"
+import { useTravelDatesStore } from "../../createTrip/store/travelDatesStore"
+import { usePreferencesStore } from "../../createTrip/store/preferencesStore"
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
 
 export function FloatingAIAssistant() {
+  const router = useRouter()
   const { isAIOpen, setAIOpen } = useDashboardStore()
-  const [messages, setMessages] = React.useState([
+  const [messages, setMessages] = React.useState<{
+    sender: string
+    text: string
+    planTripData?: any
+  }[]>([
     {
       sender: "ai",
-      text: "Hey! I'm your Trip Mind AI assistant. Where should we fly to next?",
+      text: "Hey! I'm your VoyageAI assistant. Where are we planning to go next?",
     },
   ])
   const [inputVal, setInputVal] = React.useState("")
@@ -23,6 +31,17 @@ export function FloatingAIAssistant() {
       chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }
   }, [messages, isAIOpen, isLoading])
+
+  const handleStartPlanner = (data: any) => {
+    if (data.destination) {
+      useTravelDatesStore.getState().setDestination(data.destination)
+    }
+    if (data.interests && Array.isArray(data.interests)) {
+      usePreferencesStore.getState().setSelectedInterests(data.interests)
+    }
+    setAIOpen(false)
+    router.push("/planner/create-trip")
+  }
 
   const handleSendMessage = async () => {
     if (!inputVal.trim() || isLoading) return
@@ -59,7 +78,22 @@ export function FloatingAIAssistant() {
 
       if (res.ok) {
         const data = await res.json()
-        setMessages((prev) => [...prev, { sender: "ai", text: data.reply || "No response received." }])
+        let replyText = data.reply || "No response received."
+        let planTripData = null
+
+        // Parse special [PLAN_TRIP:...] payload from response
+        const match = replyText.match(/\[PLAN_TRIP:(\{.*?\})\]/)
+        if (match) {
+          try {
+            planTripData = JSON.parse(match[1])
+            // Remove the match from visible bubble text
+            replyText = replyText.replace(match[0], "").trim()
+          } catch (e) {
+            console.error("Failed to parse PLAN_TRIP JSON:", e)
+          }
+        }
+
+        setMessages((prev) => [...prev, { sender: "ai", text: replyText, planTripData }])
       } else {
         throw new Error("Chat request failed")
       }
@@ -130,7 +164,7 @@ export function FloatingAIAssistant() {
               {messages.map((msg, i) => (
                 <div
                   key={i}
-                  className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+                  className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}
                 >
                   <div
                     className={`max-w-[80%] rounded-2xl px-3 py-2 text-xs leading-relaxed font-semibold ${
@@ -141,6 +175,15 @@ export function FloatingAIAssistant() {
                   >
                     {msg.text}
                   </div>
+                  {msg.planTripData && (
+                    <button
+                      onClick={() => handleStartPlanner(msg.planTripData)}
+                      className="mt-2 flex items-center gap-1.5 bg-gradient-to-tr from-primary-blue to-violet-600 text-white rounded-xl py-2 px-3 text-[10px] font-bold shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                    >
+                      <Sparkles className="size-3" />
+                      Plan Trip in AI Planner
+                    </button>
+                  )}
                 </div>
               ))}
               {isLoading && (

@@ -49,21 +49,18 @@ public class AiChatController {
         // Step 1: Search the web for real-time research context
         String webResearch = tavilySearchService.search(message);
 
-        // Step 2: Build an enriched prompt with web context if available
-        String tripContext = "User is exploring destinations or has trip id: " + tripId;
-        String prompt;
-        if (webResearch != null && !webResearch.isBlank()) {
-            prompt = "You are VoyageAI, a premium AI travel assistant with access to real-time web research.\n\n" +
-                     "Use the following web research to give an accurate, up-to-date answer:\n" +
-                     webResearch + "\n\n" +
-                     "Trip context: " + tripContext + "\n\n" +
-                     "Conversation history:\n" + history + "\n\n" +
-                     "User: " + message + "\n" +
-                     "VoyageAI: Provide a detailed, helpful, and personalized answer based on the research above.";
-        } else {
-            // Fallback to standard prompt when Tavily is not yet configured
-            prompt = PromptTemplates.getChatResponsePrompt(tripContext, message, history);
-        }
+        // Step 2: Build the co-pilot prompt
+        String prompt = "You are VoyageAI, a premium, friendly AI co-pilot for the Trip Mind AI travel app.\n\n" +
+                 "ROLE & CONSTRAINTS:\n" +
+                 "- Keep all responses extremely concise, short, and conversational (1 to 3 sentences maximum). Never write long guides, detailed lists, or day-by-day itineraries in chat.\n" +
+                 "- Your primary goal is to guide the user in setting up their trip by identifying: (1) their Destination, and (2) their Mood/Interests (e.g. adventure, beaches, food, relaxation, luxury).\n" +
+                 "- Once the destination and mood/interests are known from the conversation, output a short message confirming them and append exactly this instruction on a new line at the very end: [PLAN_TRIP:{\"destination\":\"<destination_name>\",\"interests\":[\"<interest_1>\",\"<interest_2>\"]}]\n" +
+                 "  (Replace <destination_name> with the chosen destination, e.g., 'Goa' or 'Paris', and interests with a JSON array of their selected interests).\n" +
+                 "- Do not generate full plans or lists of attractions. Tell the user they can generate their full custom itinerary in the AI Planner using the button below.\n\n" +
+                 (webResearch != null && !webResearch.isBlank() ? "Real-time web research context for reference:\n" + webResearch + "\n\n" : "") +
+                 "Conversation history:\n" + history + "\n\n" +
+                 "User: " + message + "\n\n" +
+                 "VoyageAI:";
 
         // Step 3: Generate AI response
         String reply = aiProviderRouter.generateText(prompt);
