@@ -27,8 +27,8 @@ public class NvidiaClientService {
     // NVIDIA API Catalog — OpenAI-compatible endpoint
     private static final String NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
 
-    // Nemotron Ultra 253B — NVIDIA's most capable reasoning model
-    private static final String MODEL = "nvidia/llama-3.1-nemotron-ultra-253b-v1";
+    // Llama 3.1 70B Instruct — Active, highly capable reasoning model
+    private static final String MODEL = "meta/llama-3.1-70b-instruct";
 
     public NvidiaClientService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;

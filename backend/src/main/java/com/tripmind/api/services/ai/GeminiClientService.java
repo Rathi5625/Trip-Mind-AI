@@ -18,7 +18,7 @@ public class GeminiClientService {
     @Value("${app.gemini.api-key:DEMO_KEY}")
     private String apiKey;
 
-    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
+    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=";
 
     public GeminiClientService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
