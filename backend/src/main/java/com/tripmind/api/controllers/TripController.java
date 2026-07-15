@@ -1,12 +1,19 @@
 package com.tripmind.api.controllers;
 
 import com.tripmind.api.dtos.TripDto;
+import com.tripmind.api.dtos.TripDayDto;
+import com.tripmind.api.dtos.BookingDto;
 import com.tripmind.api.security.UserPrincipal;
 import com.tripmind.api.services.TripService;
+import com.tripmind.api.services.WorkspaceService;
+import com.tripmind.api.entities.TripProgress;
+import com.tripmind.api.entities.TripAiForecast;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -14,11 +21,14 @@ import java.util.UUID;
 public class TripController {
 
     private final TripService tripService;
+    private final WorkspaceService workspaceService;
     private final com.tripmind.api.services.ai.ItineraryGeneratorService itineraryGeneratorService;
 
     public TripController(TripService tripService,
+                          WorkspaceService workspaceService,
                           com.tripmind.api.services.ai.ItineraryGeneratorService itineraryGeneratorService) {
         this.tripService = tripService;
+        this.workspaceService = workspaceService;
         this.itineraryGeneratorService = itineraryGeneratorService;
     }
 
@@ -30,6 +40,8 @@ public class TripController {
 
     @GetMapping("/{id}")
     public ResponseEntity<TripDto> getTripById(@PathVariable UUID id) {
+        // Ensure seeded on detail fetch too
+        workspaceService.ensureSeeded(id);
         TripDto response = tripService.getTripById(id);
         return ResponseEntity.ok(response);
     }
@@ -40,6 +52,8 @@ public class TripController {
              @RequestBody TripDto tripDto,
              @RequestParam(value = "ai", defaultValue = "false") boolean triggerAi) {
         TripDto response = tripService.createTrip(userPrincipal.getId(), tripDto, triggerAi);
+        // Seed workspace data
+        workspaceService.ensureSeeded(response.getId());
         return ResponseEntity.ok(response);
     }
 
@@ -78,5 +92,41 @@ public class TripController {
             @RequestParam("days") int days) {
         TripDto response = itineraryGeneratorService.modifyTripLength(id, days);
         return ResponseEntity.ok(response);
+    }
+
+    // Workspace overview endpoint
+    @GetMapping("/{id}/overview")
+    public ResponseEntity<Map<String, Object>> getWorkspaceOverview(@PathVariable UUID id) {
+        return ResponseEntity.ok(workspaceService.getOverview(id));
+    }
+
+    // Workspace timeline/itinerary endpoint
+    @GetMapping("/{id}/timeline")
+    public ResponseEntity<List<TripDayDto>> getWorkspaceTimeline(@PathVariable UUID id) {
+        return ResponseEntity.ok(workspaceService.getTimeline(id));
+    }
+
+    // Workspace progress endpoint
+    @GetMapping("/{id}/progress")
+    public ResponseEntity<TripProgress> getWorkspaceProgress(@PathVariable UUID id) {
+        return ResponseEntity.ok(workspaceService.getProgress(id));
+    }
+
+    // Workspace forecast endpoint
+    @GetMapping("/{id}/forecast")
+    public ResponseEntity<List<TripAiForecast>> getWorkspaceForecast(@PathVariable UUID id) {
+        return ResponseEntity.ok(workspaceService.getForecast(id));
+    }
+
+    // Workspace bookings endpoint
+    @GetMapping("/{id}/bookings")
+    public ResponseEntity<List<BookingDto>> getWorkspaceBookings(@PathVariable UUID id) {
+        return ResponseEntity.ok(workspaceService.getBookings(id));
+    }
+
+    // Workspace analytics endpoint
+    @GetMapping("/{id}/analytics")
+    public ResponseEntity<Map<String, Object>> getWorkspaceAnalytics(@PathVariable UUID id) {
+        return ResponseEntity.ok(workspaceService.getAnalytics(id));
     }
 }

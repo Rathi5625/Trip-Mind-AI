@@ -15,4 +15,5 @@ public class TripDayDto {
     private LocalDate date;
     private String description;
     private List<TransportationDto> transportations;
+    private List<ActivityDto> activities;
 }

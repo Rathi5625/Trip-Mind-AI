@@ -107,6 +107,20 @@ public class TripService {
                                         .duration(t.getDuration())
                                         .build()
                         ).collect(Collectors.toList()))
+                        .activities(day.getActivities() == null ? java.util.Collections.emptyList() : day.getActivities().stream().map(act ->
+                                ActivityDto.builder()
+                                        .id(act.getId())
+                                        .time(act.getTime())
+                                        .name(act.getName())
+                                        .description(act.getDescription())
+                                        .imageUrl(act.getImageUrl())
+                                        .category(act.getCategory())
+                                        .duration(act.getDuration())
+                                        .budget(act.getBudget())
+                                        .address(act.getAddress())
+                                        .rating(act.getRating())
+                                        .build()
+                        ).collect(Collectors.toList()))
                         .build()
         ).collect(Collectors.toList());
 

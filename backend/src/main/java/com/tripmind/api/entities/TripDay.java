@@ -36,4 +36,8 @@ public class TripDay {
     @OneToMany(mappedBy = "tripDay", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Transportation> transportations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "tripDay", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Activity> activities = new ArrayList<>();
 }
