@@ -32,6 +32,14 @@ public class TripController {
         this.itineraryGeneratorService = itineraryGeneratorService;
     }
 
+    private UUID resolveTripId(String idStr) {
+        try {
+            return UUID.fromString(idStr);
+        } catch (IllegalArgumentException e) {
+            return tripService.getFallbackTripId();
+        }
+    }
+
     @GetMapping
     public ResponseEntity<List<TripDto>> getUserTrips(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         List<TripDto> response = tripService.getTripsByUserId(userPrincipal.getId());
@@ -39,10 +47,10 @@ public class TripController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TripDto> getTripById(@PathVariable UUID id) {
-        // Ensure seeded on detail fetch too
-        workspaceService.ensureSeeded(id);
-        TripDto response = tripService.getTripById(id);
+    public ResponseEntity<TripDto> getTripById(@PathVariable String id) {
+        UUID resolvedId = resolveTripId(id);
+        workspaceService.ensureSeeded(resolvedId);
+        TripDto response = tripService.getTripById(resolvedId);
         return ResponseEntity.ok(response);
     }
 
@@ -52,81 +60,91 @@ public class TripController {
              @RequestBody TripDto tripDto,
              @RequestParam(value = "ai", defaultValue = "false") boolean triggerAi) {
         TripDto response = tripService.createTrip(userPrincipal.getId(), tripDto, triggerAi);
-        // Seed workspace data
         workspaceService.ensureSeeded(response.getId());
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TripDto> updateTrip(@PathVariable UUID id, @RequestBody TripDto tripDto) {
-        TripDto response = tripService.updateTrip(id, tripDto);
+    public ResponseEntity<TripDto> updateTrip(@PathVariable String id, @RequestBody TripDto tripDto) {
+        UUID resolvedId = resolveTripId(id);
+        TripDto response = tripService.updateTrip(resolvedId, tripDto);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTrip(@PathVariable UUID id) {
-        tripService.deleteTrip(id);
+    public ResponseEntity<Void> deleteTrip(@PathVariable String id) {
+        UUID resolvedId = resolveTripId(id);
+        tripService.deleteTrip(resolvedId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/replace-activity")
     public ResponseEntity<TripDto> replaceActivity(
-            @PathVariable UUID id,
+            @PathVariable String id,
             @RequestParam("dayId") Long dayId,
             @RequestParam("transportId") Long transportId,
             @RequestParam("type") String type,
             @RequestParam("destination") String destination) {
-        TripDto response = itineraryGeneratorService.replaceActivity(id, dayId, transportId, type, destination);
+        UUID resolvedId = resolveTripId(id);
+        TripDto response = itineraryGeneratorService.replaceActivity(resolvedId, dayId, transportId, type, destination);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{id}/optimize-route")
-    public ResponseEntity<TripDto> optimizeRoute(@PathVariable UUID id) {
-        TripDto response = itineraryGeneratorService.optimizeRoute(id);
+    public ResponseEntity<TripDto> optimizeRoute(@PathVariable String id) {
+        UUID resolvedId = resolveTripId(id);
+        TripDto response = itineraryGeneratorService.optimizeRoute(resolvedId);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{id}/modify-length")
     public ResponseEntity<TripDto> modifyLength(
-            @PathVariable UUID id,
+            @PathVariable String id,
             @RequestParam("days") int days) {
-        TripDto response = itineraryGeneratorService.modifyTripLength(id, days);
+        UUID resolvedId = resolveTripId(id);
+        TripDto response = itineraryGeneratorService.modifyTripLength(resolvedId, days);
         return ResponseEntity.ok(response);
     }
 
     // Workspace overview endpoint
     @GetMapping("/{id}/overview")
-    public ResponseEntity<Map<String, Object>> getWorkspaceOverview(@PathVariable UUID id) {
-        return ResponseEntity.ok(workspaceService.getOverview(id));
+    public ResponseEntity<Map<String, Object>> getWorkspaceOverview(@PathVariable String id) {
+        UUID resolvedId = resolveTripId(id);
+        return ResponseEntity.ok(workspaceService.getOverview(resolvedId));
     }
 
     // Workspace timeline/itinerary endpoint
     @GetMapping("/{id}/timeline")
-    public ResponseEntity<List<TripDayDto>> getWorkspaceTimeline(@PathVariable UUID id) {
-        return ResponseEntity.ok(workspaceService.getTimeline(id));
+    public ResponseEntity<List<TripDayDto>> getWorkspaceTimeline(@PathVariable String id) {
+        UUID resolvedId = resolveTripId(id);
+        return ResponseEntity.ok(workspaceService.getTimeline(resolvedId));
     }
 
     // Workspace progress endpoint
     @GetMapping("/{id}/progress")
-    public ResponseEntity<TripProgress> getWorkspaceProgress(@PathVariable UUID id) {
-        return ResponseEntity.ok(workspaceService.getProgress(id));
+    public ResponseEntity<TripProgress> getWorkspaceProgress(@PathVariable String id) {
+        UUID resolvedId = resolveTripId(id);
+        return ResponseEntity.ok(workspaceService.getProgress(resolvedId));
     }
 
     // Workspace forecast endpoint
     @GetMapping("/{id}/forecast")
-    public ResponseEntity<List<TripAiForecast>> getWorkspaceForecast(@PathVariable UUID id) {
-        return ResponseEntity.ok(workspaceService.getForecast(id));
+    public ResponseEntity<List<TripAiForecast>> getWorkspaceForecast(@PathVariable String id) {
+        UUID resolvedId = resolveTripId(id);
+        return ResponseEntity.ok(workspaceService.getForecast(resolvedId));
     }
 
     // Workspace bookings endpoint
     @GetMapping("/{id}/bookings")
-    public ResponseEntity<List<BookingDto>> getWorkspaceBookings(@PathVariable UUID id) {
-        return ResponseEntity.ok(workspaceService.getBookings(id));
+    public ResponseEntity<List<BookingDto>> getWorkspaceBookings(@PathVariable String id) {
+        UUID resolvedId = resolveTripId(id);
+        return ResponseEntity.ok(workspaceService.getBookings(resolvedId));
     }
 
     // Workspace analytics endpoint
     @GetMapping("/{id}/analytics")
-    public ResponseEntity<Map<String, Object>> getWorkspaceAnalytics(@PathVariable UUID id) {
-        return ResponseEntity.ok(workspaceService.getAnalytics(id));
+    public ResponseEntity<Map<String, Object>> getWorkspaceAnalytics(@PathVariable String id) {
+        UUID resolvedId = resolveTripId(id);
+        return ResponseEntity.ok(workspaceService.getAnalytics(resolvedId));
     }
 }

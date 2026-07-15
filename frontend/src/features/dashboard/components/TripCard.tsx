@@ -6,11 +6,15 @@ import { Calendar, ChevronRight, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Trip } from "../types/dashboard"
 
+import { useRouter } from "next/navigation"
+
 interface TripCardProps {
   trip: Trip
 }
 
 export function TripCard({ trip }: TripCardProps) {
+  const router = useRouter()
+
   const statusStyles = {
     success: "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30",
     warning: "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30",
@@ -19,7 +23,7 @@ export function TripCard({ trip }: TripCardProps) {
   }
 
   const handleCardClick = () => {
-    alert(`Redirection to details of ${trip.destination}...`)
+    router.push(`/workspace/${trip.id}`)
   }
 
   // Display top time badge

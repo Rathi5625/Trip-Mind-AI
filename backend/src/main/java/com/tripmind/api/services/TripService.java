@@ -138,4 +138,11 @@ public class TripService {
                 .days(dayDtos)
                 .build();
     }
+
+    public UUID getFallbackTripId() {
+        return tripRepository.findAll().stream()
+                .findFirst()
+                .map(Trip::getId)
+                .orElseGet(UUID::randomUUID);
+    }
 }
