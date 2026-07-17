@@ -25,6 +25,7 @@ public class WorkspaceService {
     private final BookingRepository bookingRepository;
     private final TripDayRepository tripDayRepository;
     private final ActivityRepository activityRepository;
+    private final TripBudgetTableRepository tripBudgetTableRepository;
 
     public WorkspaceService(TripRepository tripRepository,
                             TripProgressRepository tripProgressRepository,
@@ -35,7 +36,8 @@ public class WorkspaceService {
                             ExpenseRepository expenseRepository,
                             BookingRepository bookingRepository,
                             TripDayRepository tripDayRepository,
-                            ActivityRepository activityRepository) {
+                            ActivityRepository activityRepository,
+                            TripBudgetTableRepository tripBudgetTableRepository) {
         this.tripRepository = tripRepository;
         this.tripProgressRepository = tripProgressRepository;
         this.tripInsightRepository = tripInsightRepository;
@@ -46,6 +48,7 @@ public class WorkspaceService {
         this.bookingRepository = bookingRepository;
         this.tripDayRepository = tripDayRepository;
         this.activityRepository = activityRepository;
+        this.tripBudgetTableRepository = tripBudgetTableRepository;
     }
 
     @Transactional
@@ -68,9 +71,16 @@ public class WorkspaceService {
                     .trip(trip)
                     .countdownDays(12)
                     .aiScore(97)
-                    .spentBudget(1200.0)
-                    .totalBudget(3500.0)
                     .statusBadge("ON TRACK")
+                    .build());
+        }
+
+        // Also seed TripBudget if not present
+        if (tripBudgetTableRepository.findByTripId(tripId).isEmpty()) {
+            tripBudgetTableRepository.save(TripBudget.builder()
+                    .trip(trip)
+                    .totalBudget(3500.0)
+                    .spentBudget(1200.0)
                     .build());
         }
 
@@ -236,6 +246,12 @@ public class WorkspaceService {
 
         TripStats stats = tripStatsRepository.findByTripId(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Stats info not found"));
+
+        TripBudget budget = tripBudgetTableRepository.findByTripId(tripId).orElse(null);
+        if (budget != null) {
+            stats.setSpentBudget(budget.getSpentBudget());
+            stats.setTotalBudget(budget.getTotalBudget());
+        }
 
         TripWeather weather = tripWeatherRepository.findByTripId(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Weather info not found"));

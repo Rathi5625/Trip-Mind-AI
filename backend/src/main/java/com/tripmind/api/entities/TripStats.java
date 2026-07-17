@@ -26,10 +26,10 @@ public class TripStats {
     @Column(name = "ai_score")
     private Integer aiScore;
 
-    @Column(name = "spent_budget")
+    @Transient
     private Double spentBudget;
 
-    @Column(name = "total_budget")
+    @Transient
     private Double totalBudget;
 
     @Column(name = "status_badge", length = 50)
