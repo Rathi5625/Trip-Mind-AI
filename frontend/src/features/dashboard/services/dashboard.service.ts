@@ -1,13 +1,9 @@
 import { DashboardData } from "../types/dashboard"
-import { MOCK_DASHBOARD_DATA } from "../constants/dashboardData"
+import { axiosInstance } from "@/services/apiClient"
 
 export const dashboardService = {
   getDashboardData: async (): Promise<DashboardData> => {
-    // Simulate network delay
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(MOCK_DASHBOARD_DATA)
-      }, 800)
-    })
+    const response = await axiosInstance.get("/api/dashboard")
+    return response.data
   },
 }

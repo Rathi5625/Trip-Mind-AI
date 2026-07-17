@@ -4,6 +4,8 @@ import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, X, Send } from "lucide-react"
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+
 interface Message {
   sender: "bot" | "user"
   text: string
@@ -17,27 +19,58 @@ export function FloatingAIAssistant() {
   ])
   const [isTyping, setIsTyping] = React.useState(false)
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!inputVal.trim()) return
+    if (!inputVal.trim() || isTyping) return
 
     const userMsg = inputVal
     setMessages((prev) => [...prev, { sender: "user", text: userMsg }])
     setInputVal("")
     setIsTyping(true)
 
-    // Simulate chatbot typing latency
-    setTimeout(() => {
-      setIsTyping(false)
-      const lower = userMsg.toLowerCase()
-      let reply = "Kyoto generally offers more traditional temples and quieter gardens, whereas Osaka has vibrant food markets and nightlife."
-      if (lower.includes("hotel") || lower.includes("stay")) {
-        reply = "I'd suggest staying in Gion (Kyoto) for classical ryokans, or Dotonbori (Osaka) if you want to walk straight into food stalls."
-      } else if (lower.includes("shirakawa") || lower.includes("kanazawa")) {
-        reply = "Kanazawa is exceptionally well preserved! You can catch a train from Kyoto in under 2 hours."
+    // Build chat history for model context
+    const historyText = messages
+      .map((m) => `${m.sender === "bot" ? "VoyageAI" : "User"}: ${m.text}`)
+      .join("\n")
+
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
       }
-      setMessages((prev) => [...prev, { sender: "bot", text: reply }])
-    }, 1100)
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`
+      }
+
+      const res = await fetch(`${API_BASE}/api/ai/chat`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          message: userMsg,
+          tripId: "None",
+          history: historyText,
+        }),
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        const replyText = data.reply || "No response received."
+        setMessages((prev) => [...prev, { sender: "bot", text: replyText }])
+      } else {
+        throw new Error("Chat request failed")
+      }
+    } catch (e) {
+      console.error("[FloatingAIAssistant] Error sending chat:", e)
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text: "I'm having trouble connecting right now. Please check if backend is running.",
+        },
+      ])
+    } finally {
+      setIsTyping(false)
+    }
   }
 
   return (
@@ -65,7 +98,6 @@ export function FloatingAIAssistant() {
             transition={{ duration: 0.25 }}
             className="fixed bottom-24 right-6 z-50 w-[340px] h-[420px] rounded-3xl border border-black/5 bg-white shadow-2xl dark:border-white/5 dark:bg-slate-900/95 backdrop-blur-xl flex flex-col justify-between overflow-hidden select-none"
           >
-            
             {/* Header */}
             <div className="p-4 border-b border-black/5 dark:border-white/5 bg-blue-600 text-white flex items-center gap-2">
               <Sparkles className="size-4 fill-white/10" />
@@ -108,17 +140,15 @@ export function FloatingAIAssistant() {
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
                 placeholder="Ask your concierge..."
-                className="flex-grow px-3.5 py-2 rounded-full border border-black/5 bg-white text-xs text-slate-800 dark:border-white/5 dark:bg-slate-900 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="flex-grow bg-white border border-black/5 dark:bg-slate-800 dark:border-white/5 rounded-xl px-3 py-1.5 text-[10px] font-bold text-slate-700 dark:text-slate-200 focus:outline-blue-500"
               />
               <button
                 type="submit"
-                className="flex size-8 items-center justify-center rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow shrink-0 cursor-pointer transition-colors"
-                aria-label="Send message"
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-3 flex items-center justify-center cursor-pointer"
               >
                 <Send className="size-3.5" />
               </button>
             </form>
-
           </motion.div>
         )}
       </AnimatePresence>
