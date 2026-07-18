@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
   servlet:
     context-path: /
 
@@ -39,10 +39,12 @@ spring:
 
 # Custom security configuration properties
 app:
+  cors:
+    allowed-origins: ${FRONTEND_URL:http://localhost:3000},http://localhost:*,https://*.trycloudflare.com
   jwt:
-    secret: 9a4f2c5d8e7b1a6c3f5e8d9a0b2c4d6e7f9a1b3c5d7e8f0a2b4c6d8e0f1a3b5c7d9
-    accessTokenExpirationMs: 3600000 # 1 hour
-    refreshTokenExpirationMs: 604800000 # 7 days
+    secret: ${JWT_SECRET:9a4f2c5d8e7b1a6c3f5e8d9a0b2c4d6e7f9a1b3c5d7e8f0a2b4c6d8e0f1a3b5c7d9}
+    accessTokenExpirationMs: ${JWT_EXPIRATION_MS:3600000} # 1 hour
+    refreshTokenExpirationMs: ${JWT_REFRESH_EXPIRATION_MS:604800000} # 7 days
   gemini:
     api-key: ${GEMINI_API_KEY:}
   nvidia:

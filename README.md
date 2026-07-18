@@ -104,14 +104,33 @@ CREATE DATABASE tripmind_db;
    ```
 2. Open `.env` and fill in your keys:
    ```env
+   # Database Connection
    SPRING_DATASOURCE_HOST=localhost
    SPRING_DATASOURCE_PORT=5432
    SPRING_DATASOURCE_DB=tripmind_db
    SPRING_DATASOURCE_USERNAME=postgres
    SPRING_DATASOURCE_PASSWORD=your_postgres_password
-   
+
+   # JWT Security Parameters
+   JWT_SECRET=your_strong_256_bit_secret_key_here
+   JWT_EXPIRATION_MS=3600000
+   JWT_REFRESH_EXPIRATION_MS=604800000
+
+   # API Keys
    GEMINI_API_KEY=your_gemini_api_key
    WEATHER_API_KEY=your_weather_api_key
+   NVIDIA_API_KEY=your_nvidia_api_key
+   NVIDIA_IMAGE_API_KEY=your_nvidia_image_api_key
+   TAVILY_API_KEY=your_tavily_api_key
+   UNSPLASH_ACCESS_KEY=your_unsplash_access_key
+
+   # SMTP Mail Credentials
+   SPRING_MAIL_USERNAME=your_email@gmail.com
+   SPRING_MAIL_PASSWORD=your_gmail_app_password
+
+   # Endpoints & CORS
+   PORT=8080
+   FRONTEND_URL=http://localhost:3000
    ```
 3. Run the backend server using the custom PowerShell launcher (which handles loading your `.env` variables):
    ```powershell
