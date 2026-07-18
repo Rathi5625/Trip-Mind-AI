@@ -40,4 +40,10 @@ public class Attraction {
 
     @Column(length = 100)
     private String category;
+
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
 }

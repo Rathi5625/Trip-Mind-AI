@@ -60,4 +60,10 @@ public class Destination {
 
     @Column(name = "crowd_score")
     private int crowdScore; // e.g. 40
+
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
 }

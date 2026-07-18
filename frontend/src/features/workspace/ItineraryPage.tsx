@@ -344,7 +344,7 @@ function ItineraryContent({ tripId }: ItineraryPageProps) {
             </div>
 
             {isMapView ? (
-              <ItineraryMap activities={activeActivities} />
+              <ItineraryMap activities={activeActivities} tripId={tripId as string} />
             ) : (
               <div className="relative pl-6 border-l-2 border-slate-100 dark:border-slate-800 space-y-6 pt-2">
                 {activeActivities.length === 0 ? (

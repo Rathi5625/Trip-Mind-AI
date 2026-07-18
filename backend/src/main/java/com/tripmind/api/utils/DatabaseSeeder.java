@@ -110,6 +110,8 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .weatherText("Sunny")
                 .safetyIndex(92)
                 .crowdScore(80)
+                .latitude(35.6895)
+                .longitude(139.6917)
                 .build();
         destinations.add(destinationRepository.save(tokyo));
 
@@ -129,6 +131,8 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .weatherText("Sunny")
                 .safetyIndex(82)
                 .crowdScore(40)
+                .latitude(-8.4095)
+                .longitude(115.1889)
                 .build();
         destinations.add(destinationRepository.save(bali));
 
@@ -148,6 +152,8 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .weatherText("Snowy")
                 .safetyIndex(95)
                 .crowdScore(30)
+                .latitude(46.8182)
+                .longitude(8.2275)
                 .build();
         destinations.add(destinationRepository.save(switzerland));
 
@@ -167,6 +173,8 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .weatherText("Partly Cloudy")
                 .safetyIndex(85)
                 .crowdScore(75)
+                .latitude(48.8566)
+                .longitude(2.3522)
                 .build();
         destinations.add(destinationRepository.save(paris));
 

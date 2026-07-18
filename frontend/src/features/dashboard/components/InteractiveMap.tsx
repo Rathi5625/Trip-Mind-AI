@@ -2,33 +2,116 @@
 
 import * as React from "react"
 import { motion } from "framer-motion"
-import { Map, Globe, Compass, Navigation } from "lucide-react"
+import { Map, Navigation, Loader2 } from "lucide-react"
 import { GlassPanel } from "@/components/ui/GlassPanel"
 import { MapData } from "../types/dashboard"
+import { apiClient } from "@/services/apiClient"
+import { API_ENDPOINTS } from "@/constants/endpoints"
 
 interface InteractiveMapProps {
   mapData: MapData
 }
 
 export function InteractiveMap({ mapData }: InteractiveMapProps) {
-  // Pin positions on a 800x320 SVG coordinate space
-  const pins = [
-    { name: "New York, USA", x: 180, y: 110, type: "visited" },
-    { name: "London, UK", x: 380, y: 80, type: "visited" },
-    { name: "Zurich, Switzerland", x: 405, y: 95, type: "planned" },
-    { name: "Cairo, Egypt", x: 440, y: 140, type: "visited" },
-    { name: "Mumbai, India", x: 550, y: 160, type: "visited" },
-    { name: "Bali, Indonesia", x: 620, y: 220, type: "wishlist" },
-    { name: "Tokyo, Japan", x: 690, y: 115, type: "planned" },
-    { name: "Sydney, Australia", x: 720, y: 260, type: "wishlist" },
-  ]
+  const mapContainer = React.useRef<HTMLDivElement>(null)
+  const map = React.useRef<any>(null)
+  const [isLoaded, setIsLoaded] = React.useState(false)
+  const [userPins, setUserPins] = React.useState<any[]>([])
 
-  // Flight paths (curves) between pins
-  const flightPaths = [
-    { from: "New York, USA", to: "Zurich, Switzerland", x1: 180, y1: 110, x2: 405, y2: 95, color: "#2563EB" },
-    { from: "Zurich, Switzerland", to: "Tokyo, Japan", x1: 405, y1: 95, x2: 690, y2: 115, color: "#10B981" },
-    { from: "Tokyo, Japan", to: "Bali, Indonesia", x1: 690, y1: 115, x2: 620, y2: 220, color: "#D6A89C" },
-  ]
+  React.useEffect(() => {
+    if (typeof window === "undefined") return
+
+    let isMounted = true
+
+    const loadMap = async () => {
+      try {
+        const maplibregl = (await import("maplibre-gl")).default
+        await import("maplibre-gl/dist/maplibre-gl.css" as any)
+
+        if (!mapContainer.current || !isMounted) return
+
+        const isDark = document.documentElement.classList.contains("dark")
+        const styleUrl = isDark
+          ? "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
+          : "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+
+        let fetchedPins: any[] = []
+        try {
+          const data = await apiClient.get<any[]>(API_ENDPOINTS.MAP.USER_TRIPS)
+          if (Array.isArray(data) && data.length > 0) {
+            fetchedPins = data
+            setUserPins(data)
+          }
+        } catch (e) {
+          console.warn("[Dashboard Map] User trips map API unavailable:", e)
+        }
+
+        if (map.current) {
+          map.current.remove()
+        }
+
+        map.current = new maplibregl.Map({
+          container: mapContainer.current,
+          style: styleUrl,
+          center: [15, 25],
+          zoom: 1.8,
+        })
+
+        map.current.on("load", () => {
+          if (!isMounted) return
+
+          const bounds = new maplibregl.LngLatBounds()
+          let hasBounds = false
+
+          if (fetchedPins.length > 0) {
+            fetchedPins.forEach((pin) => {
+              const lng = pin.coordinates?.lng
+              const lat = pin.coordinates?.lat
+              if (lng && lat) {
+                bounds.extend([lng, lat])
+                hasBounds = true
+
+                const el = document.createElement("div")
+                const color = pin.status === "visited" ? "#94A3B8" : pin.status === "planned" ? "#2563EB" : "#F43F5E"
+                el.className = "size-3.5 rounded-full border-2 border-white shadow-lg cursor-pointer transition-transform hover:scale-125"
+                el.style.backgroundColor = color
+
+                new maplibregl.Marker({ element: el })
+                  .setLngLat([lng, lat])
+                  .setPopup(
+                    new maplibregl.Popup({ offset: 20 }).setHTML(
+                      `<div class="p-2 font-sans text-left">
+                        <h4 class="text-xs font-black text-slate-800">${pin.title || pin.destinationName}</h4>
+                        <p class="text-[10px] text-slate-500 mt-0.5">${pin.destinationName} • ${pin.status}</p>
+                      </div>`
+                    )
+                  )
+                  .addTo(map.current)
+              }
+            })
+          }
+
+          if (hasBounds && fetchedPins.length > 1) {
+            map.current.fitBounds(bounds, { padding: 40, maxZoom: 5 })
+          }
+
+          setIsLoaded(true)
+        })
+      } catch (err) {
+        console.error("Error rendering MapLibre GL dashboard map:", err)
+      }
+    }
+
+    loadMap()
+
+    return () => {
+      isMounted = false
+      if (map.current) {
+        map.current.remove()
+        map.current = null
+      }
+    }
+  }, [])
 
   return (
     <GlassPanel
@@ -46,7 +129,7 @@ export function InteractiveMap({ mapData }: InteractiveMapProps) {
               Interactive Travel Map
             </h3>
             <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 mt-0.5">
-              Live flight paths and destination pins
+              Live destination pins & user trip locations
             </p>
           </div>
         </div>
@@ -82,121 +165,19 @@ export function InteractiveMap({ mapData }: InteractiveMapProps) {
         </div>
       </div>
 
-      {/* Styled World Map Canvas */}
-      <div className="relative w-full aspect-[800/320] bg-slate-50/40 dark:bg-slate-950/20 border border-black/5 dark:border-white/5 rounded-2xl overflow-hidden shadow-inner">
-        {/* Background Grid Pattern */}
-        <svg className="absolute inset-0 size-full z-0" aria-hidden="true">
-          <defs>
-            <pattern id="dotGrid" width="20" height="20" patternUnits="userSpaceOnUse">
-              <circle cx="3" cy="3" r="1" className="fill-slate-200 dark:fill-slate-800" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#dotGrid)" />
+      {/* Map Canvas */}
+      <div className="relative w-full h-[320px] bg-slate-50/40 dark:bg-slate-950/20 border border-black/5 dark:border-white/5 rounded-2xl overflow-hidden shadow-inner">
+        {!isLoaded && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-slate-50 dark:bg-slate-900/40 z-10">
+            <Loader2 className="size-6 text-primary-blue animate-spin" />
+            <span className="text-[10px] font-bold text-slate-400">Loading travel map...</span>
+          </div>
+        )}
 
-          {/* Stylized continent vectors for aesthetics (abstract shapes) */}
-          <g className="opacity-15 dark:opacity-[0.08] fill-slate-400 dark:fill-slate-200 transition-opacity">
-            {/* North America */}
-            <path d="M 50,60 C 80,50 150,50 200,90 C 230,110 200,160 160,150 C 130,140 120,180 90,160 C 60,140 30,90 50,60 Z" />
-            {/* South America */}
-            <path d="M 170,160 C 190,170 210,210 200,250 C 190,290 160,310 150,280 C 140,250 135,210 150,185 C 160,170 165,160 170,160 Z" />
-            {/* Eurasia / Africa */}
-            <path d="M 350,50 C 450,30 650,20 720,80 C 750,110 700,160 670,150 C 640,140 600,120 570,150 C 530,180 500,220 460,200 C 420,180 380,190 370,150 C 350,110 320,80 350,50 Z" />
-            {/* Africa */}
-            <path d="M 370,160 C 410,150 440,180 460,220 C 470,250 430,280 410,300 C 390,310 380,270 375,240 C 370,210 360,180 370,160 Z" />
-            {/* Australia */}
-            <path d="M 680,240 C 720,230 740,250 735,280 C 720,300 680,290 670,270 C 660,250 670,245 680,240 Z" />
-          </g>
-
-          {/* Bezier curve flight paths with dashed flow lines */}
-          {flightPaths.map((path, idx) => {
-            // Bezier control point to make it look like a nice arc
-            const cx = (path.x1 + path.x2) / 2
-            const cy = Math.min(path.y1, path.y2) - 40 // curve upwards
-
-            return (
-              <g key={idx}>
-                {/* Background static curve */}
-                <path
-                  d={`M ${path.x1} ${path.y1} Q ${cx} ${cy} ${path.x2} ${path.y2}`}
-                  fill="none"
-                  stroke={path.color}
-                  strokeWidth="1.5"
-                  className="opacity-25"
-                />
-                {/* Animated dash flow */}
-                <motion.path
-                  d={`M ${path.x1} ${path.y1} Q ${cx} ${cy} ${path.x2} ${path.y2}`}
-                  fill="none"
-                  stroke={path.color}
-                  strokeWidth="2"
-                  strokeDasharray="6, 6"
-                  initial={{ strokeDashoffset: 0 }}
-                  animate={{ strokeDashoffset: -120 }}
-                  transition={{
-                    repeat: Infinity,
-                    duration: 4,
-                    ease: "linear",
-                  }}
-                  className="opacity-75"
-                />
-              </g>
-            )
-          })}
-        </svg>
-
-        {/* HTML overlay pins (pins are absolute positioned with SVG coordinates mapped as percentages) */}
-        {pins.map((pin) => {
-          const leftPercent = (pin.x / 800) * 100
-          const topPercent = (pin.y / 320) * 100
-
-          const getPinColor = (type: string) => {
-            if (type === "visited") return "bg-slate-400 dark:bg-slate-500 shadow-slate-400/20"
-            if (type === "planned") return "bg-primary-blue shadow-blue-500/40"
-            return "bg-rose-400 shadow-rose-400/45"
-          }
-
-          return (
-            <div
-              key={pin.name}
-              className="absolute group/pin -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10"
-              style={{ left: `${leftPercent}%`, top: `${topPercent}%` }}
-            >
-              {/* Pulsing ring indicator for planned/wishlist */}
-              {pin.type !== "visited" && (
-                <span className="absolute flex h-5 w-5">
-                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-60 ${
-                    pin.type === "planned" ? "bg-blue-400" : "bg-rose-400"
-                  }`}></span>
-                </span>
-              )}
-
-              {/* Pin Dot */}
-              <div className={`size-3 rounded-full border border-white dark:border-slate-900 shadow-lg transition-transform group-hover/pin:scale-125 z-10 cursor-pointer ${
-                getPinColor(pin.type)
-              }`} />
-
-              {/* Tooltip Label */}
-              <div className="absolute bottom-full mb-2.5 opacity-0 group-hover/pin:opacity-100 pointer-events-none transition-all duration-300 scale-90 group-hover/pin:scale-100 z-30 select-none">
-                <div className="bg-slate-900 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg dark:bg-slate-800 whitespace-nowrap shadow-md flex items-center gap-1.5 border border-white/5">
-                  <Navigation className="size-2.5 rotate-45 text-blue-400 shrink-0" />
-                  <span>{pin.name}</span>
-                  <span className={`text-[8px] font-black uppercase px-1 rounded-md ${
-                    pin.type === "visited"
-                      ? "bg-slate-800 text-slate-400"
-                      : pin.type === "planned"
-                      ? "bg-blue-900/60 text-blue-300"
-                      : "bg-rose-950/60 text-rose-300"
-                  }`}>
-                    {pin.type}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )
-        })}
+        <div ref={mapContainer} className="w-full h-full" />
 
         {/* Map Legend Overlay */}
-        <div className="absolute bottom-3 left-3 bg-white/70 backdrop-blur-md border border-black/5 dark:bg-slate-900/80 dark:border-white/5 px-2.5 py-1.5 rounded-xl z-20 flex gap-3 text-[9px] font-bold text-slate-500 dark:text-slate-400 shadow-sm">
+        <div className="absolute bottom-3 left-3 bg-white/80 backdrop-blur-md border border-black/5 dark:bg-slate-900/80 dark:border-white/5 px-2.5 py-1.5 rounded-xl z-20 flex gap-3 text-[9px] font-bold text-slate-500 dark:text-slate-400 shadow-sm">
           <div className="flex items-center gap-1">
             <span className="size-1.5 rounded-full bg-slate-400" />
             <span>Visited</span>

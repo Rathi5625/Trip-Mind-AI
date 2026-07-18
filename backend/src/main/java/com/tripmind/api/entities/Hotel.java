@@ -39,4 +39,10 @@ public class Hotel {
     private String description;
 
     private int stars;
+
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
 }

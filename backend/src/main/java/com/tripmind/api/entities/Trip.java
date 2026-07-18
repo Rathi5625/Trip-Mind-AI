@@ -61,6 +61,12 @@ public class Trip {
     @Builder.Default
     private List<TripDay> days = new ArrayList<>();
 
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

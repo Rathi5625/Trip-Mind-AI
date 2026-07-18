@@ -40,4 +40,10 @@ public class Restaurant {
 
     @Column(name = "cuisine_type", length = 100)
     private String cuisineType;
+
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
 }

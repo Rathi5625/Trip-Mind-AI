@@ -189,9 +189,9 @@ function DestinationPageContent({ destinationId }: { destinationId: string }) {
             <AttractionsSection attractions={attrHook.attractions} />
           </motion.section>
 
-          {/* Interactive mockup map */}
+          {/* Interactive map */}
           <motion.section variants={fadeUpItem}>
-            <InteractiveMap />
+            <InteractiveMap destinationId={destinationId} destinationName={destHook.destination?.name || destinationId} />
           </motion.section>
 
           {/* Budget style profiles */}

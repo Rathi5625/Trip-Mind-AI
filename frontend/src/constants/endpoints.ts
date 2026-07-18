@@ -57,6 +57,9 @@ export const API_ENDPOINTS = {
     HIDDEN_GEMS: '/api/ai/hidden-gems',
   },
   MAP: {
-    TILES: '/api/map',
+    DESTINATION: (destinationId: string) => `/api/map/destination/${destinationId}`,
+    TRIP: (tripId: string) => `/api/map/trip/${tripId}`,
+    USER_TRIPS: '/api/map/user-trips',
+    NEARBY: (lat: number, lng: number, type: string) => `/api/map/nearby?lat=${lat}&lng=${lng}&type=${type}`,
   },
 } as const;

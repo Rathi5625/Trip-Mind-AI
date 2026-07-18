@@ -43,4 +43,10 @@ public class Activity {
     private String address;
 
     private Double rating;
+
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
 }

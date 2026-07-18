@@ -40,4 +40,10 @@ public class SavedPlace {
 
     @Column(columnDefinition = "TEXT")
     private String notes;
+
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
 }
