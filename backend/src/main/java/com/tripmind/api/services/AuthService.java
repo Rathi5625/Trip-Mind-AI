@@ -27,8 +27,13 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class AuthService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
@@ -131,7 +136,7 @@ public class AuthService {
         String code = String.format("%06d", new Random().nextInt(999999));
         
         // Log code for demo logging purposes
-        System.out.println("====== GENERATED OTP FOR " + email + " (" + type + "): " + code + " ======");
+        logger.info("Generated OTP for {} ({}): {}", email, type, code);
 
         Otp otp = Otp.builder()
                 .email(email)
@@ -149,9 +154,9 @@ public class AuthService {
             message.setSubject("Trip Mind AI - Verification Code");
             message.setText("Hello,\n\nYour Trip Mind AI verification code is: " + code + "\n\nThis code will expire in 10 minutes.\n\nHappy travels,\nTrip Mind AI Team");
             mailSender.send(message);
-            System.out.println("====== SUCCESS: OTP SENT TO EMAIL " + email + " ======");
+            logger.info("Successfully sent OTP email to {}", email);
         } catch (Exception e) {
-            System.err.println("====== ERROR SENDING OTP TO EMAIL " + email + ": " + e.getMessage() + " ======");
+            logger.error("Error sending OTP email to {}: {}", email, e.getMessage());
         }
     }
 

@@ -10,8 +10,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
 public class DatabaseSeeder implements CommandLineRunner {
+
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseSeeder.class);
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -48,11 +53,11 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
         if (roleRepository.count() > 0) {
-            System.out.println("Database already seeded. Skipping seeder...");
+            logger.info("Database already seeded. Skipping seeder...");
             return;
         }
 
-        System.out.println("Starting Database Seeding Process...");
+        logger.info("Starting Database Seeding Process...");
 
         // 1. Roles
         Role userRole = roleRepository.save(Role.builder().name(RoleName.ROLE_USER).build());
@@ -82,7 +87,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             users.add(user);
         }
         userRepository.saveAll(users);
-        System.out.println("Seeded 100 Users.");
+        logger.info("Seeded 100 Users.");
 
         // 3. Destinations (500)
         List<Destination> destinations = new ArrayList<>();
@@ -213,7 +218,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             destIndex++;
         }
         destinationRepository.saveAll(destinations);
-        System.out.println("Seeded 500 Destinations.");
+        logger.info("Seeded 500 Destinations.");
 
         // 4. Hotels (400)
         List<Hotel> hotels = new ArrayList<>();
@@ -232,7 +237,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             hotels.add(hotel);
         }
         hotelRepository.saveAll(hotels);
-        System.out.println("Seeded 400 Hotels.");
+        logger.info("Seeded 400 Hotels.");
 
         // 5. Restaurants (600)
         List<Restaurant> restaurants = new ArrayList<>();
@@ -252,7 +257,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             restaurants.add(rest);
         }
         restaurantRepository.saveAll(restaurants);
-        System.out.println("Seeded 600 Restaurants.");
+        logger.info("Seeded 600 Restaurants.");
 
         // 6. Attractions (700)
         List<Attraction> attractions = new ArrayList<>();
@@ -272,7 +277,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             attractions.add(attr);
         }
         attractionRepository.saveAll(attractions);
-        System.out.println("Seeded 700 Attractions.");
+        logger.info("Seeded 700 Attractions.");
 
         // 7. Trips (300)
         List<Trip> trips = new ArrayList<>();
@@ -292,7 +297,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             trips.add(trip);
         }
         tripRepository.saveAll(trips);
-        System.out.println("Seeded 300 Trips.");
+        logger.info("Seeded 300 Trips.");
 
         // 8. Reviews (1000)
         List<Review> reviews = new ArrayList<>();
@@ -308,7 +313,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             reviews.add(review);
         }
         reviewRepository.saveAll(reviews);
-        System.out.println("Seeded 1000 Reviews.");
+        logger.info("Seeded 1000 Reviews.");
 
         // 9. Notifications
         List<Notification> notifications = new ArrayList<>();
@@ -327,7 +332,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                 .isRead(false)
                 .build());
         notificationRepository.saveAll(notifications);
-        System.out.println("Seeded Notifications.");
+        logger.info("Seeded Notifications.");
 
         // 10. Weather caches
         List<WeatherCache> weatherCaches = new ArrayList<>();
@@ -344,8 +349,8 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .build());
         }
         weatherCacheRepository.saveAll(weatherCaches);
-        System.out.println("Seeded Weather Caches.");
+        logger.info("Seeded Weather Caches.");
 
-        System.out.println("Database Seeding Completed Successfully!");
+        logger.info("Database Seeding Completed Successfully!");
     }
 }

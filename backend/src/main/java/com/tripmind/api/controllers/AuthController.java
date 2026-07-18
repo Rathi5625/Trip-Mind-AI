@@ -30,39 +30,39 @@ public class AuthController {
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<ApiResponse> verifyOtp(@Valid @RequestBody OtpRequest otpRequest) {
+    public ResponseEntity<ApiResponse<Void>> verifyOtp(@Valid @RequestBody OtpRequest otpRequest) {
         authService.verifyOtp(otpRequest.getEmail(), otpRequest.getCode(), "SIGNUP");
-        return ResponseEntity.ok(new ApiResponse(true, "OTP verified successfully."));
+        return ResponseEntity.ok(ApiResponse.success(null, "OTP verified successfully."));
     }
 
     @PostMapping("/resend-otp")
-    public ResponseEntity<ApiResponse> resendOtp(@RequestBody Map<String, String> request) {
+    public ResponseEntity<ApiResponse<Void>> resendOtp(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         String type = request.get("type");
         if (email == null || email.isBlank()) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "Email is required."));
+            return ResponseEntity.badRequest().body(ApiResponse.error(400, "Email is required."));
         }
         authService.generateAndSaveOtp(email, type != null ? type.toUpperCase() : "SIGNUP");
-        return ResponseEntity.ok(new ApiResponse(true, "Verification OTP code has been resent."));
+        return ResponseEntity.ok(ApiResponse.success(null, "Verification OTP code has been resent."));
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<ApiResponse> forgotPassword(@RequestBody Map<String, String> request) {
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         authService.requestPasswordReset(email);
-        return ResponseEntity.ok(new ApiResponse(true, "Password reset OTP sent to " + email));
+        return ResponseEntity.ok(ApiResponse.success(null, "Password reset OTP sent to " + email));
     }
 
     @PostMapping("/verify-reset-otp")
-    public ResponseEntity<ApiResponse> verifyResetOtp(@Valid @RequestBody OtpRequest otpRequest) {
+    public ResponseEntity<ApiResponse<Void>> verifyResetOtp(@Valid @RequestBody OtpRequest otpRequest) {
         authService.verifyOtp(otpRequest.getEmail(), otpRequest.getCode(), "RESET_PASSWORD");
-        return ResponseEntity.ok(new ApiResponse(true, "Reset OTP verified successfully."));
+        return ResponseEntity.ok(ApiResponse.success(null, "Reset OTP verified successfully."));
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<ApiResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+    public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
         authService.resetPassword(resetPasswordRequest);
-        return ResponseEntity.ok(new ApiResponse(true, "Password has been reset successfully."));
+        return ResponseEntity.ok(ApiResponse.success(null, "Password has been reset successfully."));
     }
 
     @PostMapping("/refresh")
@@ -70,13 +70,5 @@ public class AuthController {
         String refreshToken = request.get("refreshToken");
         JwtAuthenticationResponse response = authService.refreshAccessToken(refreshToken);
         return ResponseEntity.ok(response);
-    }
-
-    // Structured helper response DTO
-    @lombok.Getter
-    @lombok.AllArgsConstructor
-    public static class ApiResponse {
-        private boolean success;
-        private String message;
     }
 }
