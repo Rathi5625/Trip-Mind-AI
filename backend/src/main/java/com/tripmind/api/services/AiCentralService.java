@@ -1,6 +1,7 @@
 package com.tripmind.api.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tripmind.api.dtos.*;
 import com.tripmind.api.entities.*;
 import com.tripmind.api.repositories.*;
 import com.tripmind.api.services.ai.AiProviderRouter;
@@ -88,10 +89,10 @@ public class AiCentralService {
     }
 
     @Transactional
-    public Map<String, String> chat(Map<String, String> request) {
-        String message = request.getOrDefault("message", "");
-        String tripIdStr = request.getOrDefault("tripId", "");
-        String history = request.getOrDefault("history", "");
+    public Map<String, String> chat(AiChatRequest request) {
+        String message = request.getMessage() != null ? request.getMessage() : "";
+        String tripIdStr = request.getTripId() != null ? request.getTripId() : "";
+        String history = request.getHistory() != null ? request.getHistory() : "";
 
         UUID tripId = null;
         if (!tripIdStr.isEmpty() && !"None".equals(tripIdStr)) {
@@ -139,11 +140,11 @@ public class AiCentralService {
     }
 
     @Transactional
-    public Map<String, Object> planner(Map<String, Object> request) {
-        String destination = (String) request.getOrDefault("destination", "Tokyo");
-        String budget = (String) request.getOrDefault("budget", "comfort");
-        String pace = (String) request.getOrDefault("pace", "balanced");
-        int duration = Integer.parseInt(String.valueOf(request.getOrDefault("duration", "5")));
+    public Map<String, Object> planner(AiPlannerRequest request) {
+        String destination = request.getDestination() != null ? request.getDestination() : "Tokyo";
+        String budget = request.getBudget() != null ? request.getBudget() : "comfort";
+        String pace = request.getPace() != null ? request.getPace() : "balanced";
+        int duration = request.getDuration() != null ? request.getDuration() : 5;
 
         String prompt = String.format(
                 "Act as a professional AI travel planner. Plan a premium trip to %s.\n" +
@@ -195,8 +196,8 @@ public class AiCentralService {
     }
 
     @Transactional
-    public Map<String, Object> optimize(Map<String, Object> request) {
-        String tripIdStr = (String) request.getOrDefault("tripId", "");
+    public Map<String, Object> optimize(AiOptimizeRequest request) {
+        String tripIdStr = request.getTripId() != null ? request.getTripId() : "";
         UUID tripId = null;
         try { tripId = UUID.fromString(tripIdStr); } catch (Exception ignored) {}
 
@@ -211,7 +212,7 @@ public class AiCentralService {
                     .optimizationType("Timing & Budget")
                     .timeSavedMin(40)
                     .budgetSaved(150.0)
-                    .originalDetails(request.toString())
+                    .originalDetails(request.getItinerary())
                     .optimizedDetails(cleaned)
                     .build());
         } catch (Exception ignored) {}
@@ -229,13 +230,13 @@ public class AiCentralService {
     }
 
     @Transactional
-    public List<Map<String, Object>> recommend(Map<String, String> request) {
-        String tripIdStr = request.getOrDefault("tripId", "");
+    public List<Map<String, Object>> recommend(AiRecommendRequest request) {
+        String tripIdStr = request.getTripId() != null ? request.getTripId() : "";
         UUID tripId = null;
         try { tripId = UUID.fromString(tripIdStr); } catch (Exception ignored) {}
 
-        String category = request.getOrDefault("category", "hotel");
-        String location = request.getOrDefault("location", "Tokyo");
+        String category = request.getCategory() != null ? request.getCategory() : "hotel";
+        String location = request.getLocation() != null ? request.getLocation() : "Tokyo";
 
         String prompt = String.format(
                 "Recommend 3 premium %s options in %s. Return a JSON array of objects with keys: name, description, estimatedCost, rating. " +
@@ -272,8 +273,8 @@ public class AiCentralService {
     }
 
     @Transactional
-    public List<Map<String, Object>> hiddenGems(Map<String, String> request) {
-        String destinationName = request.getOrDefault("destinationName", "Tokyo");
+    public List<Map<String, Object>> hiddenGems(AiHiddenGemsRequest request) {
+        String destinationName = request.getDestinationName() != null ? request.getDestinationName() : "Tokyo";
 
         String prompt = String.format(
                 "Recommend 3 secret hidden gems in %s. Return a JSON array with name, description, discoveryScore (integer 85-99). No markdown.",

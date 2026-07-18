@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ControllerAdvice
@@ -65,10 +67,23 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, WebRequest request) {
         logger.warn("Validation failed for request to {}", request.getDescription(false));
         Map<String, String> errors = new HashMap<>();
+        List<ErrorResponse.FieldErrorDetail> fieldErrors = new ArrayList<>();
+
         ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String message = error.getDefaultMessage();
-            errors.put(fieldName, message);
+            if (error instanceof FieldError fieldError) {
+                String fieldName = fieldError.getField();
+                String message = fieldError.getDefaultMessage();
+                Object rejectedValue = fieldError.getRejectedValue();
+
+                errors.put(fieldName, message);
+                fieldErrors.add(ErrorResponse.FieldErrorDetail.builder()
+                        .field(fieldName)
+                        .rejectedValue(rejectedValue)
+                        .message(message)
+                        .build());
+            } else {
+                errors.put(error.getObjectName(), error.getDefaultMessage());
+            }
         });
 
         ErrorResponse errorResponse = ErrorResponse.builder()
@@ -78,6 +93,7 @@ public class GlobalExceptionHandler {
                 .message("Input validation failed for one or more fields")
                 .path(request.getDescription(false).replace("uri=", ""))
                 .validationErrors(errors)
+                .fieldErrors(fieldErrors)
                 .build();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);

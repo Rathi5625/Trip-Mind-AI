@@ -5,7 +5,6 @@ import com.tripmind.api.services.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -36,21 +35,15 @@ public class AuthController {
     }
 
     @PostMapping("/resend-otp")
-    public ResponseEntity<ApiResponse<Void>> resendOtp(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        String type = request.get("type");
-        if (email == null || email.isBlank()) {
-            return ResponseEntity.badRequest().body(ApiResponse.error(400, "Email is required."));
-        }
-        authService.generateAndSaveOtp(email, type != null ? type.toUpperCase() : "SIGNUP");
+    public ResponseEntity<ApiResponse<Void>> resendOtp(@Valid @RequestBody ResendOtpRequest request) {
+        authService.generateAndSaveOtp(request.getEmail(), request.getType() != null ? request.getType().toUpperCase() : "SIGNUP");
         return ResponseEntity.ok(ApiResponse.success(null, "Verification OTP code has been resent."));
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<ApiResponse<Void>> forgotPassword(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        authService.requestPasswordReset(email);
-        return ResponseEntity.ok(ApiResponse.success(null, "Password reset OTP sent to " + email));
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authService.requestPasswordReset(request.getEmail());
+        return ResponseEntity.ok(ApiResponse.success(null, "Password reset OTP sent to " + request.getEmail()));
     }
 
     @PostMapping("/verify-reset-otp")
@@ -66,9 +59,8 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<JwtAuthenticationResponse> refreshAccessToken(@RequestBody Map<String, String> request) {
-        String refreshToken = request.get("refreshToken");
-        JwtAuthenticationResponse response = authService.refreshAccessToken(refreshToken);
+    public ResponseEntity<JwtAuthenticationResponse> refreshAccessToken(@Valid @RequestBody RefreshTokenRequest request) {
+        JwtAuthenticationResponse response = authService.refreshAccessToken(request.getRefreshToken());
         return ResponseEntity.ok(response);
     }
 }

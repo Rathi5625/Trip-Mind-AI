@@ -1,5 +1,6 @@
 package com.tripmind.api.services;
 
+import com.tripmind.api.dtos.PlannerRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -7,8 +8,8 @@ import java.util.*;
 @Service
 public class PlannerService {
 
-    public Map<String, Object> generateTripPlan(Map<String, String> request) {
-        String prompt = request != null ? request.getOrDefault("prompt", "").toLowerCase() : "";
+    public Map<String, Object> generateTripPlan(PlannerRequest request) {
+        String prompt = request != null && request.getPrompt() != null ? request.getPrompt().toLowerCase() : "";
         Map<String, Object> result = new LinkedHashMap<>();
         Map<String, Object> destInfo = new LinkedHashMap<>();
         String itineraryText;

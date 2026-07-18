@@ -15,6 +15,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.tripmind.api.dtos.AiChatRequest;
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/ai-chat")
 public class AiChatController {
@@ -41,10 +44,10 @@ public class AiChatController {
      * 3. Returns a grounded, factual travel answer
      */
     @PostMapping
-    public ResponseEntity<Map<String, String>> chatWithAssistant(@RequestBody Map<String, String> request) {
-        String message = request.getOrDefault("message", "");
-        String tripId  = request.getOrDefault("tripId", "None");
-        String history = request.getOrDefault("history", "");
+    public ResponseEntity<Map<String, String>> chatWithAssistant(@Valid @RequestBody AiChatRequest request) {
+        String message = request.getMessage() != null ? request.getMessage() : "";
+        String tripId  = request.getTripId() != null ? request.getTripId() : "None";
+        String history = request.getHistory() != null ? request.getHistory() : "";
 
         // Step 1: Search the web for real-time research context
         String webResearch = tavilySearchService.search(message);

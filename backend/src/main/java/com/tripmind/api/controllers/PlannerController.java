@@ -1,6 +1,8 @@
 package com.tripmind.api.controllers;
 
+import com.tripmind.api.dtos.PlannerRequest;
 import com.tripmind.api.services.PlannerService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +19,7 @@ public class PlannerController {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<Map<String, Object>> generateTripPlan(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> generateTripPlan(@Valid @RequestBody PlannerRequest request) {
         Map<String, Object> result = plannerService.generateTripPlan(request);
         return ResponseEntity.ok(result);
     }

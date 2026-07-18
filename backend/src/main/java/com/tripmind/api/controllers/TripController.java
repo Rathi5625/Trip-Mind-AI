@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/trips")
 public class TripController {
@@ -57,7 +59,7 @@ public class TripController {
     @PostMapping
     public ResponseEntity<TripDto> createTrip(
              @AuthenticationPrincipal UserPrincipal userPrincipal,
-             @RequestBody TripDto tripDto,
+             @Valid @RequestBody TripDto tripDto,
              @RequestParam(value = "ai", defaultValue = "false") boolean triggerAi) {
         TripDto response = tripService.createTrip(userPrincipal.getId(), tripDto, triggerAi);
         workspaceService.ensureSeeded(response.getId());
@@ -65,7 +67,7 @@ public class TripController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TripDto> updateTrip(@PathVariable String id, @RequestBody TripDto tripDto) {
+    public ResponseEntity<TripDto> updateTrip(@PathVariable String id, @Valid @RequestBody TripDto tripDto) {
         UUID resolvedId = resolveTripId(id);
         TripDto response = tripService.updateTrip(resolvedId, tripDto);
         return ResponseEntity.ok(response);
