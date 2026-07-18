@@ -1,13 +1,13 @@
-﻿import { Destination } from "../types/destination"
+import { Destination } from "../types/destination"
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+import { apiClient } from "@/services/apiClient"
+import { API_ENDPOINTS } from "@/constants/endpoints"
 
 const getDestinationImage = async (name: string): Promise<string> => {
   try {
-    const res = await fetch(`${API_BASE}/api/ai-chat/image?q=${encodeURIComponent(name + " travel destination")}`)
-    if (res.ok) {
-      const d = await res.json()
-      return d.imageUrl
+    const data = await apiClient.get<{ imageUrl?: string }>(API_ENDPOINTS.AI.IMAGE(`${name} travel destination`))
+    if (data?.imageUrl) {
+      return data.imageUrl
     }
   } catch (_) {}
   return "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=600&q=80"

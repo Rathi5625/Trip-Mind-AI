@@ -1,9 +1,9 @@
 import { DashboardData } from "../types/dashboard"
-import { axiosInstance } from "@/services/apiClient"
+import { apiClient } from "@/services/apiClient"
+import { API_ENDPOINTS } from "@/constants/endpoints"
 
 export const dashboardService = {
   getDashboardData: async (): Promise<DashboardData> => {
-    const response = await axiosInstance.get("/api/dashboard")
-    return response.data
+    return apiClient.get(API_ENDPOINTS.DASHBOARD.BASE)
   },
 }

@@ -1,28 +1,27 @@
 import { apiClient } from './apiClient';
+import { API_ENDPOINTS } from '@/constants/endpoints';
 import { Destination, Place } from '../mockData';
 
 export const discoverService = {
   searchDestinations: async (query: string): Promise<Destination[]> => {
-    return apiClient.get(`/api/destinations?q=${encodeURIComponent(query)}`);
+    return apiClient.get(API_ENDPOINTS.DESTINATIONS.SEARCH(query));
   },
 
   getDestinationDetails: async (id: string): Promise<Destination | undefined> => {
-    return apiClient.get(`/api/destinations/${id}`);
+    return apiClient.get(API_ENDPOINTS.DESTINATIONS.BY_ID(id));
   },
 
   getTrendingDestinations: async (): Promise<Destination[]> => {
-    // Falls back to retrieving all destinations for trending list
-    return apiClient.get('/api/destinations');
+    return apiClient.get(API_ENDPOINTS.DESTINATIONS.BASE);
   },
 
   getPlacesForDestination: async (destinationId: string, category?: string): Promise<Place[]> => {
-    // Map to specific hotels/restaurants/attractions endpoint based on category
     if (category === 'hotel') {
-      return apiClient.get(`/api/hotels/${destinationId}`);
+      return apiClient.get(API_ENDPOINTS.HOTELS.BY_DESTINATION(destinationId));
     } else if (category === 'restaurant') {
-      return apiClient.get(`/api/restaurants/${destinationId}`);
+      return apiClient.get(API_ENDPOINTS.RESTAURANTS.BY_DESTINATION(destinationId));
     } else {
-      return apiClient.get(`/api/attractions/${destinationId}`);
+      return apiClient.get(API_ENDPOINTS.ATTRACTIONS.BY_DESTINATION(destinationId));
     }
   }
 };

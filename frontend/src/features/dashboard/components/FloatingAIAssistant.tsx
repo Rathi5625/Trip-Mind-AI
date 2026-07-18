@@ -7,7 +7,8 @@ import { useDashboardStore } from "../hooks/useDashboard"
 import { useRouter } from "next/navigation"
 import { useTravelDatesStore } from "../../createTrip/store/travelDatesStore"
 import { usePreferencesStore } from "../../createTrip/store/preferencesStore"
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+import { apiClient } from "@/services/apiClient"
+import { API_ENDPOINTS } from "@/constants/endpoints"
 
 export function FloatingAIAssistant() {
   const router = useRouter()
@@ -58,28 +59,14 @@ export function FloatingAIAssistant() {
       .join("\n")
 
     try {
-      const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      }
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`
-      }
-
-      const res = await fetch(`${API_BASE}/api/ai-chat`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          message: userQuery,
-          tripId: "None",
-          history: historyText,
-        }),
+      const data = await apiClient.post<{ reply?: string }>(API_ENDPOINTS.AI.AI_CHAT_LEGACY, {
+        message: userQuery,
+        tripId: "None",
+        history: historyText,
       })
 
-      if (res.ok) {
-        const data = await res.json()
-        let replyText = data.reply || "No response received."
-        let planTripData = null
+      let replyText = data?.reply || "No response received."
+      let planTripData = null
 
         // Parse special [PLAN_TRIP:...] payload from response
         const match = replyText.match(/\[PLAN_TRIP:(\{.*?\})\]/)
@@ -94,9 +81,6 @@ export function FloatingAIAssistant() {
         }
 
         setMessages((prev) => [...prev, { sender: "ai", text: replyText, planTripData }])
-      } else {
-        throw new Error("Chat request failed")
-      }
     } catch (e) {
       console.error("[FloatingAIAssistant] Error sending chat:", e)
       setMessages((prev) => [

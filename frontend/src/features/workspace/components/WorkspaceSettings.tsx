@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { axiosInstance } from "@/services/apiClient"
+import { apiClient } from "@/services/apiClient"
 import { WorkspaceOverview } from "../types/workspace"
 
 interface WorkspaceSettingsProps {
@@ -19,10 +19,7 @@ export function WorkspaceSettings({ overview }: WorkspaceSettingsProps) {
 
   // Save changes mutation
   const mutation = useMutation({
-    mutationFn: async (data: any) => {
-      const response = await axiosInstance.put(`/api/trips/${overview.tripId}`, data)
-      return response.data
-    },
+    mutationFn: (data: any) => apiClient.put(`/api/trips/${overview.tripId}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["workspaceOverview", overview.tripId] })
       alert("Trip preferences updated successfully!")

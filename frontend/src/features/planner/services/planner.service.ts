@@ -1,5 +1,5 @@
 import { DestinationInfo } from "../types/planner"
-import { axiosInstance } from "@/services/apiClient"
+import { apiClient } from "@/services/apiClient"
 
 export interface GenerationResult {
   destination: DestinationInfo
@@ -8,7 +8,6 @@ export interface GenerationResult {
 
 export const plannerService = {
   generateTripPlan: async (prompt: string): Promise<GenerationResult> => {
-    const response = await axiosInstance.post<GenerationResult>('/api/planner/generate', { prompt });
-    return response.data;
+    return apiClient.post<GenerationResult>('/api/planner/generate', { prompt });
   }
 }

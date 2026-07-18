@@ -85,6 +85,8 @@ export interface NearbyPlace {
   tags: Record<string, string>
 }
 
+import axios from "axios"
+
 async function fetchNearbyPlaces(
   coords: Coordinates,
   amenity: OverpassAmenity,
@@ -98,13 +100,11 @@ async function fetchNearbyPlaces(
     );
     out body;
   `
-  const res = await fetch(OVERPASS_API, {
-    method: "POST",
-    body: `data=${encodeURIComponent(query)}`
+  const res = await axios.post(OVERPASS_API, `data=${encodeURIComponent(query)}`, {
+    headers: { "Content-Type": "application/x-www-form-urlencoded" }
   })
-  if (!res.ok) throw new Error("Overpass API failed")
 
-  const data = await res.json()
+  const data = res.data
   return ((data.elements ?? []) as any[])
     .filter((el) => el.lat && el.lon && el.tags?.name)
     .map((el) => ({
@@ -135,34 +135,6 @@ export function useNearbyPlaces(
   })
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// useRoute — Calculate route between waypoints
-// ─────────────────────────────────────────────────────────────────────────────
-
-export function useRoute(
-  request: RouteRequest | null,
-  options?: { enabled?: boolean }
-) {
-  return useQuery({
-    queryKey: request
-      ? MAP_QUERY_KEYS.route(request.waypoints, request.profile)
-      : ["map", "route", null],
-    queryFn: () => (request ? calculateRoute(request) : null),
-    enabled:
-      (options?.enabled ?? true) &&
-      !!request &&
-      request.waypoints.length >= 2,
-    staleTime: 1000 * 60 * 10,
-    gcTime: 1000 * 60 * 20,
-    retry: 1,
-    refetchOnWindowFocus: false
-  })
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// useWeather — Open-Meteo (free, no key)
-// ─────────────────────────────────────────────────────────────────────────────
-
 export interface SimpleWeather {
   tempC: number
   condition: string
@@ -180,9 +152,8 @@ async function fetchWeather(coords: Coordinates): Promise<SimpleWeather> {
     wind_speed_unit: "kmh",
     timezone: "auto"
   })
-  const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`)
-  if (!res.ok) throw new Error("Weather API failed")
-  const data = await res.json()
+  const res = await axios.get(`https://api.open-meteo.com/v1/forecast?${params}`)
+  const data = res.data
   const c = data.current ?? {}
 
   const wmoToEmoji = (code: number): { emoji: string; condition: string } => {

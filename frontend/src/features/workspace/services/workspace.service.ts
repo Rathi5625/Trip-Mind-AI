@@ -1,4 +1,5 @@
 import { apiClient } from "@/services/apiClient"
+import { API_ENDPOINTS } from "@/constants/endpoints"
 import {
   WorkspaceOverview,
   ItineraryDay,
@@ -10,26 +11,26 @@ import {
 
 export const workspaceService = {
   getOverview: async (tripId: string): Promise<WorkspaceOverview> => {
-    return apiClient.get(`/api/trips/${tripId}/overview`)
+    return apiClient.get(API_ENDPOINTS.TRIPS.OVERVIEW(tripId))
   },
 
   getTimeline: async (tripId: string): Promise<ItineraryDay[]> => {
-    return apiClient.get(`/api/trips/${tripId}/timeline`)
+    return apiClient.get(API_ENDPOINTS.TRIPS.TIMELINE(tripId))
   },
 
   getProgress: async (tripId: string): Promise<ProgressData> => {
-    return apiClient.get(`/api/trips/${tripId}/progress`)
+    return apiClient.get(API_ENDPOINTS.TRIPS.PROGRESS(tripId))
   },
 
   getForecast: async (tripId: string): Promise<ForecastData[]> => {
-    return apiClient.get(`/api/trips/${tripId}/forecast`)
+    return apiClient.get(API_ENDPOINTS.TRIPS.FORECAST(tripId))
   },
 
   getBookings: async (tripId: string): Promise<Booking[]> => {
-    return apiClient.get(`/api/trips/${tripId}/bookings`)
+    return apiClient.get(API_ENDPOINTS.TRIPS.BOOKINGS(tripId))
   },
 
   getAnalytics: async (tripId: string): Promise<AnalyticsData> => {
-    return apiClient.get(`/api/trips/${tripId}/analytics`)
+    return apiClient.get(API_ENDPOINTS.TRIPS.ANALYTICS(tripId))
   }
 }

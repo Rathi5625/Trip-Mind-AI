@@ -23,11 +23,11 @@ export function useChat(tripId: string = "None") {
     mutationFn: async ({ message, history }: { message: string; history: string }) => {
       return aiService.chat(message, tripId, history)
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       const assistantMessage: ChatMessage = {
         id: Math.random().toString(),
         role: "assistant",
-        content: data.reply,
+        content: data?.reply || "No response received",
         timestamp: new Date()
       }
       setMessages((prev) => [...prev, assistantMessage])

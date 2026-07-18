@@ -3,8 +3,8 @@
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, X, Send } from "lucide-react"
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+import { apiClient } from "@/services/apiClient"
+import { API_ENDPOINTS } from "@/constants/endpoints"
 
 interface Message {
   sender: "bot" | "user"
@@ -28,37 +28,19 @@ export function FloatingAIAssistant() {
     setInputVal("")
     setIsTyping(true)
 
-    // Build chat history for model context
     const historyText = messages
       .map((m) => `${m.sender === "bot" ? "VoyageAI" : "User"}: ${m.text}`)
       .join("\n")
 
     try {
-      const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      }
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`
-      }
-
-      const res = await fetch(`${API_BASE}/api/ai/chat`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          message: userMsg,
-          tripId: "None",
-          history: historyText,
-        }),
+      const data = await apiClient.post<{ reply?: string }>(API_ENDPOINTS.AI.CHAT, {
+        message: userMsg,
+        tripId: "None",
+        history: historyText,
       })
 
-      if (res.ok) {
-        const data = await res.json()
-        const replyText = data.reply || "No response received."
-        setMessages((prev) => [...prev, { sender: "bot", text: replyText }])
-      } else {
-        throw new Error("Chat request failed")
-      }
+      const replyText = data?.reply || "No response received."
+      setMessages((prev) => [...prev, { sender: "bot", text: replyText }])
     } catch (e) {
       console.error("[FloatingAIAssistant] Error sending chat:", e)
       setMessages((prev) => [
@@ -75,7 +57,6 @@ export function FloatingAIAssistant() {
 
   return (
     <>
-      {/* Floating round button */}
       <div className="fixed bottom-6 right-6 z-50 select-none">
         <motion.button
           onClick={() => setIsOpen(!isOpen)}
@@ -88,7 +69,6 @@ export function FloatingAIAssistant() {
         </motion.button>
       </div>
 
-      {/* Chat panel drawer */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -98,7 +78,6 @@ export function FloatingAIAssistant() {
             transition={{ duration: 0.25 }}
             className="fixed bottom-24 right-6 z-50 w-[340px] h-[420px] rounded-3xl border border-black/5 bg-white shadow-2xl dark:border-white/5 dark:bg-slate-900/95 backdrop-blur-xl flex flex-col justify-between overflow-hidden select-none"
           >
-            {/* Header */}
             <div className="p-4 border-b border-black/5 dark:border-white/5 bg-blue-600 text-white flex items-center gap-2">
               <Sparkles className="size-4 fill-white/10" />
               <div className="text-left">
@@ -107,7 +86,6 @@ export function FloatingAIAssistant() {
               </div>
             </div>
 
-            {/* Chat Messages viewport */}
             <div className="flex-grow p-4 overflow-y-auto space-y-3 flex flex-col">
               {messages.map((msg, i) => (
                 <div
@@ -130,7 +108,6 @@ export function FloatingAIAssistant() {
               )}
             </div>
 
-            {/* Submission Input footer */}
             <form
               onSubmit={handleSend}
               className="p-3 border-t border-black/5 dark:border-white/5 bg-slate-50/50 dark:bg-slate-950/20 flex gap-2"
